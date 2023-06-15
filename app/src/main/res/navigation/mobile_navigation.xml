@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.go4sumbergedang.go4.ui.fragment.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/keranjangFragment"
+        android:name="com.go4sumbergedang.go4.ui.fragment.KeranjangFragment"
+        android:label="fragment_keranjang"
+        tools:layout="@layout/fragment_keranjang" />
+    <fragment
+        android:id="@+id/transaksiFragment"
+        android:name="com.go4sumbergedang.go4.ui.fragment.TransaksiFragment"
+        android:label="fragment_transaksi"
+        tools:layout="@layout/fragment_transaksi" />
+    <fragment
+        android:id="@+id/profilFragment"
+        android:name="com.go4sumbergedang.go4.ui.fragment.ProfilFragment"
+        android:label="fragment_profil"
+        tools:layout="@layout/fragment_profil" />
+</navigation>

@@ -3,11 +3,26 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/drawable/bg_circle_primary.xml" value="0.1" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/drawable/bg_edttext.xml" value="0.1" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/drawable/ic_home.xml" value="0.1" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/drawable/ic_keranjang.xml" value="0.1" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/drawable/ic_profil.xml" value="0.1" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/drawable/ic_transaksi.xml" value="0.1" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/drawable/rounded_button.xml" value="0.1" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_data_resto_terdekat.xml" value="0.18333333333333332" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_login.xml" value="0.22" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_main.xml" value="0.2234375" />
-        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_register.xml" value="0.209375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_register.xml" value="0.14" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_root.xml" value="0.2234375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_ulasan.xml" value="0.2234375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/custom_appbar.xml" value="0.14" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/fragment_home.xml" value="0.16" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/fragment_keranjang.xml" value="0.2234375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/fragment_profil.xml" value="0.2234375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/fragment_transaksi.xml" value="0.2234375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/list_ulasan.xml" value="0.2234375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/menu/bottom_nav_menu.xml" value="0.2234375" />
       </map>
     </option>
   </component>

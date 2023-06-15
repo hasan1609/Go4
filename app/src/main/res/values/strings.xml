@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Go4</string>
+    <string name="title_activity_root">RootActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_keranjang">Keranjang</string>
+    <string name="title_transaksi">Transaksi</string>
+    <string name="title_profil">Profil</string>
 </resources>
