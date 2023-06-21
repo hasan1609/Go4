@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/navigation_keranjang"
-        android:icon="@drawable/ic_keranjang"
+        android:icon="@drawable/ic_cart"
         android:title="@string/title_keranjang"/>
 
     <item

@@ -4,14 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.databinding.ActivityUlasanBinding
+import com.go4sumbergedang.go4.databinding.ActivityDetailPesananBinding
 import org.jetbrains.anko.AnkoLogger
 
-class UlasanActivity : AppCompatActivity() , AnkoLogger{
-    private lateinit var binding: ActivityUlasanBinding
+class DetailPesananActivity : AppCompatActivity() , AnkoLogger{
+    private lateinit var binding: ActivityDetailPesananBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_ulasan)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_pesanan)
         binding.lifecycleOwner = this
     }
 }

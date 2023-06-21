@@ -14,23 +14,29 @@
         android:theme="@style/Theme.Go4"
         tools:targetApi="31">
         <activity
-            android:name=".DataRestoTerdekatActivity"
+            android:name=".ui.activity.DetailPesananActivity"
             android:exported="false" />
         <activity
-            android:name=".RootActivity"
+            android:name=".ui.activity.DetailProdukActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.DetailRestoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.DataRestoTerdekatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.RootActivity"
             android:exported="false"
             android:label="@string/title_activity_root" />
         <activity
-            android:name=".UlasanActivity"
+            android:name=".ui.activity.UlasanActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".ui.activity.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".ui.activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
