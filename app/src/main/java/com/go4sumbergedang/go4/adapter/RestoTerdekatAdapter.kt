@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.DetailRestoTerdekatModel
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
 class RestoTerdekatAdapter (
@@ -49,11 +50,23 @@ class RestoTerdekatAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val list = listData[position]
+        val urlImage = context.getString(R.string.urlImage)
+        val fotoResto = list.foto.toString()
+        var def = "/public/images/no_image.png"
+
         holder.nama.text = list.namaResto.toString().toUpperCase()
         val jarak = list.distance.toString()
-        holder.jarak.text = "$jarak + KM"
+        holder.jarak.text = "$jarak KM"
+        if (list.foto != null) {
+            Picasso.get()
+                .load(urlImage+fotoResto)
+                .into(holder.foto)
+        }else{
+            Picasso.get()
+                .load(urlImage+def)
+                .into(holder.foto)
+        }
         holder.itemView.setOnClickListener {
             if (dialog!=null){
                 dialog!!.onClick(position,list)

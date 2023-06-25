@@ -74,7 +74,7 @@ data class DetailRestoTerdekatModel(
 data class UserModel(
 
 	@field:SerializedName("fcm")
-	val fcm: Any? = null,
+	val fcm: String? = null,
 
 	@field:SerializedName("role")
 	val role: String? = null,
