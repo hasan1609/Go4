@@ -16,113 +16,125 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <ImageView
-                android:id="@+id/foto_produk"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:src="@drawable/makanan"
-                android:background="@color/grey"/>
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/txt_nama_produk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nama mkanan"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:layout_below="@+id/foto_produk"
-                android:layout_marginHorizontal="26dp"
-                android:layout_marginTop="16dp"/>
+                    <ImageView
+                        android:id="@+id/foto_produk"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:src="@drawable/makanan"
+                        android:background="@color/grey"/>
 
-            <TextView
-                android:id="@+id/txt_harga_produk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Rp. 10.0000"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:layout_below="@+id/txt_nama_produk"
-                android:layout_marginHorizontal="26dp"
-                android:layout_marginTop="3dp"/>
+                    <TextView
+                        android:id="@+id/txt_nama_produk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nama mkanan"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/foto_produk"
+                        android:layout_marginHorizontal="26dp"
+                        android:layout_marginTop="16dp"/>
 
-            <TextView
-                android:id="@+id/txt_ket_produk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Loremn uefuhd fdn hvfrgd jhgjvf"
-                android:textSize="14sp"
-                android:layout_below="@+id/txt_harga_produk"
-                android:layout_marginHorizontal="26dp"
-                android:layout_marginTop="5dp"/>
+                    <TextView
+                        android:id="@+id/txt_harga_produk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Rp. 10.0000"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/txt_nama_produk"
+                        android:layout_marginHorizontal="26dp"/>
 
-            <View
-                android:id="@+id/ly_space"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:layout_below="@+id/txt_ket_produk"
-                android:layout_marginVertical="15dp"
-                android:background="@color/scndary_color" />
+                    <TextView
+                        android:visibility="gone"
+                        android:id="@+id/txt_ket_produk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/txt_harga_produk"
+                        android:layout_marginHorizontal="26dp"
+                        android:layout_marginTop="3dp"
+                        android:textStyle="italic"
+                        android:text="Loremn uefuhd fdn hvfrgd jhgjvf"
+                        android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/txt_catatan_produk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Catatan"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_below="@+id/ly_space"
-                android:layout_marginHorizontal="26dp"/>
+                    <View
+                        android:id="@+id/ly_space"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_below="@+id/txt_ket_produk"
+                        android:layout_marginVertical="15dp"
+                        android:background="@color/scndary_color" />
 
-            <EditText
-                android:id="@+id/edt_catatan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="26dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="26dp"
-                android:background="@drawable/bg_edttext"
-                android:gravity="top|start"
-                android:hint="Masukkan Catatan....."
-                android:inputType="textMultiLine"
-                android:lines="2"
-                android:layout_below="@+id/txt_catatan_produk"
-                android:minHeight="60dp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="8dp"
-                android:scrollbars="vertical" />
+                    <TextView
+                        android:id="@+id/txt_catatan_produk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Catatan"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_below="@+id/ly_space"
+                        android:layout_marginHorizontal="26dp"/>
 
-            <LinearLayout
-                android:id="@+id/ly_jumlah"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/edt_catatan"
-                android:layout_centerHorizontal="true"
-                android:layout_marginVertical="60dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                    <EditText
+                        android:id="@+id/edt_catatan"
+                        android:layout_width="355dp"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/txt_catatan_produk"
+                        android:layout_marginStart="26dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="26dp"
+                        android:background="@drawable/bg_edttext"
+                        android:gravity="top|start"
+                        android:hint="Masukkan Catatan....."
+                        android:inputType="textMultiLine"
+                        android:lines="2"
+                        android:minHeight="60dp"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        android:scrollbars="vertical" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_plus" />
+                    <LinearLayout
+                        android:id="@+id/ly_jumlah"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/edt_catatan"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginVertical="25dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/edt_jumlah"
-                    android:layout_width="32dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="15dp"
-                    android:inputType="number"/>
+                        <ImageView
+                            android:id="@+id/ic_plus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_plus" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_min" />
-            </LinearLayout>
+                        <EditText
+                            android:id="@+id/edt_jumlah"
+                            android:layout_width="32dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="15dp"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:textStyle="bold" />
 
+                        <ImageView
+                            android:id="@+id/ic_min"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_min" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </ScrollView>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -150,7 +162,7 @@
                     android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:backgroundTintMode="@color/primary_color"
+                    android:backgroundTint="@color/primary_color"
                     android:text="Beli" />
 
             </LinearLayout>
@@ -158,6 +170,7 @@
 
         <!-- AppBar Layout -->
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"

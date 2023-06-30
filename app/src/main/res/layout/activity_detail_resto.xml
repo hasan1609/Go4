@@ -13,104 +13,124 @@
         tools:context=".ui.activity.DetailPesananActivity">
 
         <!-- Content Layout -->
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <ImageView
-                android:id="@+id/foto_resto"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:src="@drawable/makanan"
-                android:background="@color/grey"/>
+                android:layout_height="match_parent">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/ly_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="100dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="4dp">
+                <ImageView
+                    android:id="@+id/foto_resto"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:src="@drawable/makanan"
+                    android:background="@color/grey"/>
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/ly_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="15dp"
-                    android:paddingVertical="10dp"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/txt_nama_resto"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Nama Toko"
-                        android:textStyle="bold"
-                        android:textSize="16sp"/>
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="100dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="4dp">
 
-                    <TextView
-                        android:id="@+id/txt_jarak"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="± 30 KM"
-                        android:textStyle="italic"
-                        android:textSize="14sp"/>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp">
+                        android:paddingHorizontal="15dp"
+                        android:paddingVertical="10dp"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/txt_nama_resto"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Nama Toko"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
 
                         <TextView
-                            android:id="@+id/txt_ualasan"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/txt_jarak"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Ulasan :"
-                            android:textStyle="bold" />
+                            android:layout_marginTop="3dp"
+                            android:text="± 30 KM"
+                            android:textStyle="italic"
+                            android:textSize="14sp"/>
 
-                        <TextView
-                            android:id="@+id/txt_rating"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="3dp"
-                            android:layout_width="wrap_content"
+                        <RelativeLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/txt_ualasan"
-                            android:text="5.0"
-                            android:textStyle="bold" />
-                        <ImageView
-                            android:layout_width="17dp"
-                            android:layout_height="17dp"
-                            android:src="@drawable/ic_star"
-                            android:layout_toRightOf="@+id/txt_rating"/>
+                            android:layout_marginTop="8dp">
 
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="#00E3E3E3"
-                            android:layout_alignParentRight="true"
-                            android:src="@drawable/ic_arrow_forward"
-                            app:tint="@color/black" />
-                    </RelativeLayout>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.3dp"
-                        android:layout_marginVertical="3dp"
-                        android:background="@color/scndary_color" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                            <TextView
+                                android:id="@+id/txt_ualasan"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ulasan :"
+                                android:textStyle="bold" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/ly_card"
-                android:id="@+id/rv_produk"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="25dp" />
-        </RelativeLayout>
+                            <TextView
+                                android:id="@+id/txt_rating"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="3dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_toRightOf="@+id/txt_ualasan"
+                                android:text="5.0"
+                                android:textStyle="bold" />
+                            <ImageView
+                                android:layout_width="17dp"
+                                android:layout_height="17dp"
+                                android:src="@drawable/ic_star"
+                                android:layout_toRightOf="@+id/txt_rating"/>
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:backgroundTint="#00E3E3E3"
+                                android:layout_alignParentRight="true"
+                                android:src="@drawable/ic_arrow_forward"
+                                app:tint="@color/black" />
+                        </RelativeLayout>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0.3dp"
+                            android:layout_marginVertical="3dp"
+                            android:background="@color/scndary_color" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ly_card"
+                    android:id="@+id/rv_produk"
+                    android:visibility="gone"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="25dp" />
+                <TextView
+
+                    android:id="@+id/txt_kosong"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Maaf Produk Masih Kosong"
+                    android:textSize="18sp"
+                    android:layout_marginTop="30dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:layout_below="@id/ly_card"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="25dp" />
+            </RelativeLayout>
+        </ScrollView>
+
 
         <!-- AppBar Layout -->
         <com.google.android.material.appbar.AppBarLayout

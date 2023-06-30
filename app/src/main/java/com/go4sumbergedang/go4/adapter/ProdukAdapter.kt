@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
+import com.go4sumbergedang.go4.model.DetailRestoTerdekatModel
 import com.go4sumbergedang.go4.model.ProdukModel
 import com.squareup.picasso.Picasso
 
@@ -19,11 +20,20 @@ class ProdukAdapter(
     private val ITEM_TYPE_HEADER = 0
     private val ITEM_TYPE_PRODUK = 1
 
+    private var dialog: Dialog? = null
+    interface Dialog {
+        fun onClick(position: Int, list : ProdukModel)
+    }
+
+    fun setDialog(dialog: Dialog) {
+        this.dialog = dialog
+    }
+
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val txtKategori: TextView = itemView.findViewById(R.id.header_textview)
 
         fun bind(kategori: String) {
-            txtKategori.text = kategori
+            txtKategori.text = kategori.toUpperCase()
         }
     }
 
@@ -68,6 +78,11 @@ class ProdukAdapter(
             holder.bind(item)
         } else if (holder is ProdukViewHolder && item is ProdukModel) {
             holder.bind(item)
+            holder.itemView.setOnClickListener {
+                if (dialog!=null){
+                    dialog!!.onClick(position,item)
+                }
+            }
         }
     }
 

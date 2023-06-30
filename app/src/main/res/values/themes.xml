@@ -24,4 +24,10 @@
         <item name="cornerSizeTopLeft">20dp</item>
         <item name="cornerSizeTopRight">4dp</item>
     </style>
+
+    <style name="ShapeAppearanceOverlay.App.CornerCircle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>

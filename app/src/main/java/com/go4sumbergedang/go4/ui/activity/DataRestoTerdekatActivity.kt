@@ -1,8 +1,10 @@
 package com.go4sumbergedang.go4.ui.activity
 
 import android.app.ProgressDialog
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.go4sumbergedang.go4.R
@@ -69,18 +71,25 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
                         val data = response.body()
                         if (data!!.status == true) {
                             loading(false)
-                            for (hasil in data.data!!) {
-                                notesList.add(hasil!!)
-                                mAdapter = RestoTerdekatAdapter(notesList, this@DataRestoTerdekatActivity)
-                                binding.rvRestoTerdekat.adapter = mAdapter
-                                mAdapter.setDialog(object : RestoTerdekatAdapter.Dialog{
-                                    override fun onClick(position: Int, note: DetailRestoTerdekatModel) {
-                                        val gson = Gson()
-                                        val noteJson = gson.toJson(note)
-                                        startActivity<DetailRestoActivity>("detailResto" to noteJson)
-                                    }
-                                })
-                                mAdapter.notifyDataSetChanged()
+                            if (data.data!!.isEmpty()){
+                                binding.rvRestoTerdekat.visibility = View.GONE
+                                binding.txtKosong.visibility = View.VISIBLE
+                            }else{
+                                for (hasil in data.data!!) {
+                                    notesList.add(hasil!!)
+                                    mAdapter = RestoTerdekatAdapter(notesList, this@DataRestoTerdekatActivity)
+                                    binding.rvRestoTerdekat.visibility = View.VISIBLE
+                                    binding.txtKosong.visibility = View.GONE
+                                    binding.rvRestoTerdekat.adapter = mAdapter
+                                    mAdapter.setDialog(object : RestoTerdekatAdapter.Dialog{
+                                        override fun onClick(position: Int, note: DetailRestoTerdekatModel) {
+                                            val gson = Gson()
+                                            val noteJson = gson.toJson(note)
+                                            startActivity<DetailRestoActivity>("detailResto" to noteJson)
+                                        }
+                                    })
+                                    mAdapter.notifyDataSetChanged()
+                                }
                             }
                         }
                     } else {

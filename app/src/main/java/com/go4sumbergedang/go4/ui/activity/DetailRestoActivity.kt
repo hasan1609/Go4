@@ -3,15 +3,16 @@ package com.go4sumbergedang.go4.ui.activity
 import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.ProdukAdapter
-import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailRestoBinding
 import com.go4sumbergedang.go4.model.*
 import com.go4sumbergedang.go4.webservices.ApiClient
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
 import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.custom_appbar.view.*
@@ -39,6 +40,13 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
         binding.appBar.backButton.setOnClickListener{
             onBackPressed()
         }
+
+        // Buat instance BadgeDrawable
+        val badgeDrawable = BadgeDrawable.create(this)
+        badgeDrawable.number = 5 // Atur jumlah badge
+        badgeDrawable.isVisible = true // Tampilkan badge
+        // Tambahkan badge ke ImageView
+        BadgeUtils.attachBadgeDrawable(badgeDrawable, binding.appBar.ic_cart)
         val gson = Gson()
         detailResto =
             gson.fromJson(intent.getStringExtra("detailResto"), DetailRestoTerdekatModel::class.java)
@@ -78,10 +86,24 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
                         loading(false)
                         val data = response.body()
                         if (data?.status == true) {
-                            val produkList = data.data ?: emptyList<ProdukModel>()
-                            val groupedProduk = groupProdukByKategori(produkList as List<ProdukModel>)
-                            mAdapter = ProdukAdapter(groupedProduk, this@DetailRestoActivity)
-                            binding.rvProduk.adapter = mAdapter
+                            if (data.data!!.isEmpty()){
+                                binding.rvProduk.visibility = View.GONE
+                                binding.txtKosong.visibility = View.VISIBLE
+                            }else{
+                                val produkList = data.data ?: emptyList<ProdukModel>()
+                                val groupedProduk = groupProdukByKategori(produkList as List<ProdukModel>)
+                                binding.rvProduk.visibility = View.VISIBLE
+                                binding.txtKosong.visibility = View.GONE
+                                mAdapter = ProdukAdapter(groupedProduk, this@DetailRestoActivity)
+                                binding.rvProduk.adapter = mAdapter
+                                mAdapter.setDialog(object : ProdukAdapter.Dialog{
+                                    override fun onClick(position: Int, note: ProdukModel) {
+                                        val gson = Gson()
+                                        val noteJson = gson.toJson(note)
+                                        startActivity<DetailProdukActivity>("detailProduk" to noteJson)
+                                    }
+                                })
+                            }
                         }
                     } else {
                         loading(false)
