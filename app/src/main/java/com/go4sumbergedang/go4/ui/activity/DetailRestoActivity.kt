@@ -41,12 +41,6 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
             onBackPressed()
         }
 
-        // Buat instance BadgeDrawable
-        val badgeDrawable = BadgeDrawable.create(this)
-        badgeDrawable.number = 5 // Atur jumlah badge
-        badgeDrawable.isVisible = true // Tampilkan badge
-        // Tambahkan badge ke ImageView
-        BadgeUtils.attachBadgeDrawable(badgeDrawable, binding.appBar.ic_cart)
         val gson = Gson()
         detailResto =
             gson.fromJson(intent.getStringExtra("detailResto"), DetailRestoTerdekatModel::class.java)

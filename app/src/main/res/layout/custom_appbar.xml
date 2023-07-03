@@ -1,50 +1,73 @@
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="10dp"
-    android:elevation="10dp">
-
-    <!-- Bagian Pertama -->
+    android:elevation="5dp"
+    android:layout_height="wrap_content">
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_weight="1">
+        android:padding="10dp"
+        android:elevation="10dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/backButton"
-            android:layout_marginStart="10dp"
-            android:layout_width="wrap_content"
+        <!-- Bagian Pertama -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/back" />
+            android:orientation="horizontal"
+            android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_marginStart="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:text="Resto Terdekat" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/backButton"
+                android:layout_marginStart="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/back" />
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_marginStart="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/btn_toKeranjang"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="15dp">
+
+            <ImageView
+                android:id="@+id/img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_cart"/>
+
+            <RelativeLayout
+                android:id="@+id/div_angka"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/badge_background">
+
+                <TextView
+                    android:id="@+id/tv_angka"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:maxLength="2"
+                    android:text="99"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:textSize="11dp" />
+
+            </RelativeLayout>
+        </RelativeLayout>
 
     </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <ImageView
-            android:layout_marginHorizontal="10dp"
-            android:id="@+id/ic_cart"
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_cart" />
-    </RelativeLayout>
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -7,13 +7,18 @@
 
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.activity.DetailPesananActivity">
+        android:layout_height="match_parent">
 
-        <!-- Content Layout -->
+        <include
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/custom_appbar"/>
+
         <ScrollView
+            android:layout_below="@id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -130,21 +135,6 @@
                     android:layout_marginBottom="25dp" />
             </RelativeLayout>
         </ScrollView>
-
-
-        <!-- AppBar Layout -->
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:theme="@style/ThemeOverlay.AppCompat.Light">
-
-            <!-- Custom AppBar -->
-            <include layout="@layout/custom_appbar" />
-
-        </com.google.android.material.appbar.AppBarLayout>
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </RelativeLayout>
 
 </layout>

@@ -33,18 +33,9 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_data_resto_terdekat)
         binding.lifecycleOwner = this
         progressDialog = ProgressDialog(this)
-        setupToolbar()
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(true)
-        supportActionBar?.setTitle("Resto Terdekat")
-        binding.toolbar.setNavigationIcon(R.drawable.back)
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
+        binding.appBar.titleTextView.text = "Resto Terdekat"
+        binding.appBar.backButton.setOnClickListener{
+            finish()
         }
     }
 
