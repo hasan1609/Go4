@@ -6,26 +6,23 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.ActivityDetailProdukBinding
-import com.go4sumbergedang.go4.model.DetailRestoTerdekatModel
 import com.go4sumbergedang.go4.model.ProdukModel
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.custom_appbar.view.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import org.jetbrains.anko.toast
 
 class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
     private lateinit var binding: ActivityDetailProdukBinding
     lateinit var detailProduk: ProdukModel
     var jumlah = 1
-    private lateinit var database: DatabaseReference
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_produk)
         binding.lifecycleOwner = this
-        database = FirebaseDatabase.getInstance().reference
 
         val gson = Gson()
         detailProduk =
@@ -63,27 +60,36 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
 
     private fun addToCart() {
         val newData = ProdukModel(
-            idProduk = detailProduk.idProduk,
-            namaProduk = detailProduk.namaProduk,
-            keterangan = detailProduk.keterangan,
-            terjual = detailProduk.terjual,
-            harga = detailProduk.harga,
-            updatedAt = detailProduk.updatedAt,
-            userId = detailProduk.userId,
-            createdAt = detailProduk.createdAt,
-            kategori = detailProduk.kategori,
-            fotoProduk = detailProduk.fotoProduk,
-            status = detailProduk.status
+            idProduk = detailProduk.idProduk.toString(),
+            namaProduk = detailProduk.namaProduk.toString(),
+            keterangan = detailProduk.keterangan.toString(),
+            terjual = detailProduk.terjual.toString(),
+            harga = detailProduk.harga.toString(),
+            updatedAt = detailProduk.updatedAt.toString(),
+            userId = detailProduk.userId.toString(),
+            createdAt = detailProduk.createdAt.toString(),
+            kategori = detailProduk.kategori.toString(),
+            fotoProduk = detailProduk.fotoProduk.toString(),
+            status = detailProduk.status.toString()
         )
-        val newKey = detailProduk.idProduk.toString()
 
-        val dataRef = database.child("cart").child(newKey)
-        dataRef.setValue(newData)
-            .addOnSuccessListener {
-                toast("Berhasil")
+        val collectionReference = firestore.collection("cart")
+        collectionReference.document(newData.userId.toString())
+            .set(newData)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Tampilkan pesan
+                    val message = "Produk ditambahkan ke keranjang"
+                    toast(message)
+                } else {
+                    val exception = task.exception
+                    toast("Gagal menambahkan produk ke keranjang: ${exception?.message}")
+                    info { "hasan ${exception?.message}" }
+                }
             }
-            .addOnFailureListener { error ->
-                toast("gak kenek")
+            .addOnFailureListener { exception ->
+                toast("Gagal menambahkan produk ke keranjang")
+                info { "hasan ${exception.message}" }
             }
     }
 }
