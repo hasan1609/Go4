@@ -10,9 +10,11 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.ProdukAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailRestoBinding
 import com.go4sumbergedang.go4.model.*
+import com.go4sumbergedang.go4.utils.CartUtils
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
+import com.google.firebase.database.DatabaseError
 import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.custom_appbar.view.*
@@ -148,6 +150,31 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
         } else {
             progressDialog.dismiss()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        CartUtils.startCountDataListener("id_user")
+        CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
+            override fun onCountUpdated(count: Long) {
+                if (count > 0) {
+                    binding.appBar.divAngka.visibility = View.VISIBLE
+                    binding.appBar.tvAngka.text = count.toString()
+                } else {
+                    binding.appBar.divAngka.visibility = View.GONE
+                }
+            }
+
+            override fun onError(error: DatabaseError) {
+                // Tangani kesalahan jika ada
+            }
+        })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        CartUtils.stopCountDataListener("id_user")
     }
 
 }

@@ -61,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:maxLength="2"
-                    android:text="99"
+                    android:text=""
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:textSize="11dp" />

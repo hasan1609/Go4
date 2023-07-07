@@ -6,7 +6,10 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.ActivityDetailProdukBinding
+import com.go4sumbergedang.go4.model.CartModel
 import com.go4sumbergedang.go4.model.ProdukModel
+import com.go4sumbergedang.go4.utils.CartUtils
+import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
@@ -17,7 +20,8 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
     private lateinit var binding: ActivityDetailProdukBinding
     lateinit var detailProduk: ProdukModel
     var jumlah = 1
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,37 +63,64 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
     }
 
     private fun addToCart() {
-        val newData = ProdukModel(
+        val newData = CartModel(
             idProduk = detailProduk.idProduk.toString(),
             namaProduk = detailProduk.namaProduk.toString(),
-            keterangan = detailProduk.keterangan.toString(),
-            terjual = detailProduk.terjual.toString(),
             harga = detailProduk.harga.toString(),
-            updatedAt = detailProduk.updatedAt.toString(),
-            userId = detailProduk.userId.toString(),
-            createdAt = detailProduk.createdAt.toString(),
             kategori = detailProduk.kategori.toString(),
             fotoProduk = detailProduk.fotoProduk.toString(),
-            status = detailProduk.status.toString()
+            jumlah = binding.edtJumlah.text.toString().toInt(),
+            catatan = binding.edtCatatan.text.toString()
         )
 
-        val collectionReference = firestore.collection("cart")
-        collectionReference.document(newData.userId.toString())
-            .set(newData)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Tampilkan pesan
-                    val message = "Produk ditambahkan ke keranjang"
-                    toast(message)
-                } else {
-                    val exception = task.exception
-                    toast("Gagal menambahkan produk ke keranjang: ${exception?.message}")
-                    info { "hasan ${exception?.message}" }
-                }
-            }
-            .addOnFailureListener { exception ->
+        CartUtils.addToCart(newData, "id_user",
+            onSuccess = {
+                val message = "Produk ditambahkan ke keranjang"
+                toast(message)
+
+                // Panggil fungsi setCountDataListener() dengan listener di DetailProdukActivity
+                CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
+                    override fun onCountUpdated(count: Long) {
+                        updateCountValue(count)
+                    }
+
+                    override fun onError(error: DatabaseError) {
+                        // Tangani kesalahan jika ada
+                    }
+                })
+            },
+            onFailure = {
                 toast("Gagal menambahkan produk ke keranjang")
-                info { "hasan ${exception.message}" }
             }
+        )
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        CartUtils.startCountDataListener("id_user")
+        CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
+            override fun onCountUpdated(count: Long) {
+                updateCountValue(count)
+            }
+
+            override fun onError(error: DatabaseError) {
+                // Tangani kesalahan jika ada
+            }
+        })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        CartUtils.stopCountDataListener("id_user")
+    }
+
+    private fun updateCountValue(count: Long) {
+        if (count > 0) {
+            binding.appBar.divAngka.visibility = View.VISIBLE
+            binding.appBar.tvAngka.text = count.toString()
+        } else {
+            binding.appBar.divAngka.visibility = View.GONE
+        }
     }
 }

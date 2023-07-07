@@ -12,7 +12,10 @@ import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDataRestoTerdekatBinding
 import com.go4sumbergedang.go4.model.DetailRestoTerdekatModel
 import com.go4sumbergedang.go4.model.ResponseRestoTerdekat
+import com.go4sumbergedang.go4.utils.CartUtils
 import com.go4sumbergedang.go4.webservices.ApiClient
+import com.google.firebase.FirebaseApp
+import com.google.firebase.database.DatabaseError
 import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -39,10 +42,6 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        getData("-7.649166","112.682555")
-    }
 
     private fun getData(latitude: String, longitude : String) {
         binding.rvRestoTerdekat.layoutManager = LinearLayoutManager(this)
@@ -99,6 +98,30 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
                 toast(t.message.toString())
             }
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        getData("-7.649166","112.682555")
+        CartUtils.startCountDataListener("id_user")
+        CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
+            override fun onCountUpdated(count: Long) {
+                if (count > 0) {
+                    binding.appBar.divAngka.visibility = View.VISIBLE
+                    binding.appBar.tvAngka.text = count.toString()
+                } else {
+                    binding.appBar.divAngka.visibility = View.GONE
+                }
+            }
+
+            override fun onError(error: DatabaseError) {
+                // Tangani kesalahan jika ada
+            }
+        })
+    }
+    override fun onStop() {
+        super.onStop()
+        CartUtils.stopCountDataListener("id_user")
     }
 
     private fun loading(isLoading: Boolean) {
