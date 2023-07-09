@@ -13,10 +13,9 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_weight="1">
+            android:orientation="horizontal">
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -28,9 +27,9 @@
             </RelativeLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
                 android:layout_marginStart="10dp"
                 android:layout_gravity="start"
                 android:orientation="vertical">
@@ -53,15 +52,38 @@
                     android:textSize="12sp" />
 
                 <TextView
-                    android:id="@+id/txt_total"
+                    android:id="@+id/txt_ket"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:layout_marginTop="2dp"
-                    android:text="Total"
+                    android:text="Keterangan"
+                    android:textStyle="italic"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txt_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="2dp"
+                    android:text="Edit"
                     android:textStyle="bold"
-                    android:textSize="12sp" />
+                    android:textColor="@color/primary_color"
+                    android:textSize="16sp" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_total"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_marginTop="2dp"
+                android:text="Rp. 1233434"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="@color/primary_color"
+                android:textSize="16sp" />
         </LinearLayout>
         <RelativeLayout
             android:layout_width="0dp"

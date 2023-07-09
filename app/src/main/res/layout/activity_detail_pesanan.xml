@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:src="@drawable/ic_pinmapfill" />
+                android:src="@drawable/ic_pinmap" />
 
             <TextView
                 android:id="@+id/txt_lokasi_antar"
