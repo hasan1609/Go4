@@ -8,9 +8,9 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.ActivityDetailProdukBinding
 import com.go4sumbergedang.go4.model.CartModel
 import com.go4sumbergedang.go4.model.ProdukModel
+import com.go4sumbergedang.go4.model.TokoItemModel
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.google.firebase.database.*
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -21,7 +21,6 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
     lateinit var detailProduk: ProdukModel
     var jumlah = 1
     private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +33,7 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
 
         binding.appBar.titleTextView.text = "Detail Produk"
         binding.appBar.backButton.setOnClickListener{
-            finish()
+            onBackPressed()
         }
         binding.txtNamaProduk.text = detailProduk.namaProduk
         binding.txtHargaProduk.text = detailProduk.harga
@@ -63,64 +62,85 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
     }
 
     private fun addToCart() {
-        val newData = CartModel(
-            idProduk = detailProduk.idProduk.toString(),
-            namaProduk = detailProduk.namaProduk.toString(),
-            harga = detailProduk.harga.toString(),
-            kategori = detailProduk.kategori.toString(),
-            fotoProduk = detailProduk.fotoProduk.toString(),
-            jumlah = binding.edtJumlah.text.toString().toInt(),
-            catatan = binding.edtCatatan.text.toString()
-        )
+        val dataProduk = CartModel()
+        dataProduk.idProduk = detailProduk.idProduk.toString()
+        dataProduk.namaProduk = detailProduk.namaProduk.toString()
+        dataProduk.harga = detailProduk.harga.toString()
+        dataProduk.kategori = detailProduk.kategori.toString()
+        dataProduk.fotoProduk = detailProduk.fotoProduk.toString()
+        dataProduk.jumlah = binding.edtJumlah.text.toString().toInt()
+        dataProduk.catatan = binding.edtCatatan.text.toString()
 
-        CartUtils.addToCart(newData, "id_user",
-            onSuccess = {
-                val message = "Produk ditambahkan ke keranjang"
-                toast(message)
+        // Ambil data toko dari Firebase
+        val cartReference = firebaseDatabase.reference.child("cart")
+        val userIdReference = cartReference.child("id_user")
+        val tokoReference = userIdReference.child("id_toko2")
 
-                // Panggil fungsi setCountDataListener() dengan listener di DetailProdukActivity
-                CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
-                    override fun onCountUpdated(count: Long) {
-                        updateCountValue(count)
+        // Ambil data toko dari Firebase
+        tokoReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                var dataToko = dataSnapshot.getValue(TokoItemModel::class.java)
+
+                if (dataToko != null) {
+                    // Jika data toko sudah ada
+                    val cartItems = dataToko.cartItems
+
+                    if (cartItems != null && cartItems.containsKey(dataProduk.idProduk)) {
+                        // Jika item cart dengan key yang sama sudah ada, tambahkan jumlahnya
+                        val existingProduk = cartItems[dataProduk.idProduk]
+                        val existingJumlah = existingProduk?.jumlah ?: 0
+                        existingProduk?.jumlah = existingJumlah + dataProduk.jumlah!!
+                    } else {
+                        // Jika item cart belum ada, tambahkan ke dalam list cartItems
+                        cartItems?.put(dataProduk.idProduk.toString(), dataProduk)
                     }
+                } else {
+                    // Jika data toko belum ada, buat data toko baru dan tambahkan item cart ke dalam list cartItems
+                    val cartItems = mutableMapOf<String, CartModel>()
+                    cartItems[dataProduk.idProduk.toString()] = dataProduk
 
-                    override fun onError(error: DatabaseError) {
-                        // Tangani kesalahan jika ada
+                    dataToko = TokoItemModel(
+                        nama_toko = "ddsfgsjfgj",
+                        foto = "gjfjdhfjdf",
+                        cartItems = cartItems
+                    )
+                }
+
+                // Simpan data toko ke Firebase
+                tokoReference.setValue(dataToko)
+                    .addOnSuccessListener {
+                        // Data produk berhasil ditambahkan
+                        toast("Produk berhasil ditambahkan")
+                        finish()
                     }
-                })
-            },
-            onFailure = {
-                toast("Gagal menambahkan produk ke keranjang")
-            }
-        )
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        CartUtils.startCountDataListener("id_user")
-        CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
-            override fun onCountUpdated(count: Long) {
-                updateCountValue(count)
+                    .addOnFailureListener { exception ->
+                        toast("Produk gagal ditambahkan")
+                    }
             }
 
-            override fun onError(error: DatabaseError) {
-                // Tangani kesalahan jika ada
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Tangani kesalahan jika terjadi
+                toast("Terjadi kesalahan")
             }
         })
     }
 
-    override fun onStop() {
-        super.onStop()
-        CartUtils.stopCountDataListener("id_user")
-    }
 
-    private fun updateCountValue(count: Long) {
-        if (count > 0) {
-            binding.appBar.divAngka.visibility = View.VISIBLE
-            binding.appBar.tvAngka.text = count.toString()
-        } else {
-            binding.appBar.divAngka.visibility = View.GONE
+    override fun onStart() {
+        super.onStart()
+        val countDataListener = object : CartUtils.CountDataListener {
+            override fun onCountUpdated(count: Long) {
+                if (count > 0){
+                    binding.appBar.divBadge.visibility = View.VISIBLE
+                }else{
+                    binding.appBar.divBadge.visibility = View.GONE
+                }
+            }
+
+            override fun onError(error: DatabaseError) {
+                // Tangani kesalahan jika terjadi
+            }
         }
+        CartUtils.startCountDataListener("id_user", countDataListener)
     }
 }

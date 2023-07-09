@@ -5,56 +5,67 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.go4sumbergedang.go4.R
+import com.go4sumbergedang.go4.adapter.TokoCartAdapter
+import com.go4sumbergedang.go4.databinding.FragmentKeranjangBinding
+import com.go4sumbergedang.go4.model.TokoItemModel
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.support.v4.toast
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [KerajangFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class KeranjangFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+class KeranjangFragment : Fragment(), AnkoLogger {
+    private lateinit var binding: FragmentKeranjangBinding
+    private lateinit var cartAdapter: TokoCartAdapter
+    private val cartList: MutableList<TokoItemModel> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_keranjang, container, false)
+        binding = DataBindingUtil.inflate(inflater ,R.layout.fragment_keranjang, container, false)
+        binding.lifecycleOwner = this
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment KerajangFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            KeranjangFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    fun getData(){
+        binding.rvProduk.layoutManager = LinearLayoutManager(requireActivity())
+        cartAdapter = TokoCartAdapter(cartList, requireActivity())
+        binding.rvProduk.adapter = cartAdapter
+
+        val userId = "id_user"
+        val cartReference = FirebaseDatabase.getInstance().reference
+            .child("cart")
+            .child(userId)
+
+        val cartListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                cartList.clear()
+                for (tokoSnapshot in dataSnapshot.children) {
+                    val tokoCart = tokoSnapshot.getValue(TokoItemModel::class.java)
+                    if (tokoCart != null) {
+                        // Tambahkan data toko ke list
+                        cartList.add(tokoCart)
+                    }
                 }
+                cartAdapter.notifyDataSetChanged()
             }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                toast("Gagal mendapatkan data")
+            }
+        }
+
+        cartReference.addValueEventListener(cartListener)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        getData()
     }
 }

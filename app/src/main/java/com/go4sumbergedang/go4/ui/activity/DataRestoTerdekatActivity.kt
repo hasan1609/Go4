@@ -40,6 +40,22 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener{
             finish()
         }
+        getData("-7.649166","112.682555")
+
+        val countDataListener = object : CartUtils.CountDataListener {
+            override fun onCountUpdated(count: Long) {
+                if (count > 0){
+                    binding.appBar.divBadge.visibility = View.VISIBLE
+                }else{
+                    binding.appBar.divBadge.visibility = View.GONE
+                }
+            }
+
+            override fun onError(error: DatabaseError) {
+                // Tangani kesalahan jika terjadi
+            }
+        }
+        CartUtils.startCountDataListener("id_user", countDataListener)
     }
 
 
@@ -65,7 +81,7 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
                                 binding.rvRestoTerdekat.visibility = View.GONE
                                 binding.txtKosong.visibility = View.VISIBLE
                             }else{
-                                for (hasil in data.data!!) {
+                                for (hasil in data.data) {
                                     notesList.add(hasil!!)
                                     mAdapter = RestoTerdekatAdapter(notesList, this@DataRestoTerdekatActivity)
                                     binding.rvRestoTerdekat.visibility = View.VISIBLE
@@ -102,26 +118,11 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        getData("-7.649166","112.682555")
-        CartUtils.startCountDataListener("id_user")
-        CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
-            override fun onCountUpdated(count: Long) {
-                if (count > 0) {
-                    binding.appBar.divAngka.visibility = View.VISIBLE
-                    binding.appBar.tvAngka.text = count.toString()
-                } else {
-                    binding.appBar.divAngka.visibility = View.GONE
-                }
-            }
-
-            override fun onError(error: DatabaseError) {
-                // Tangani kesalahan jika ada
-            }
-        })
     }
-    override fun onStop() {
-        super.onStop()
-        CartUtils.stopCountDataListener("id_user")
+
+    override fun onDestroy() {
+        super.onDestroy()
+        CartUtils.stopCountDataListener()
     }
 
     private fun loading(isLoading: Boolean) {

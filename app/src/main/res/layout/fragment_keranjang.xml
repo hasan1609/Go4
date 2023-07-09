@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragment.KeranjangFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
 
-    <!-- TODO: Update blank fragment layout -->
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:context=".ui.fragment.KeranjangFragment">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Keranjang"
-            android:textSize="16dp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginVertical="20dp"
             android:gravity="center"/>
@@ -22,10 +24,19 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Maaf belum ada notifikasi"
-            android:textSize="14dp"
+            android:text="Keranjang Anda Masih Kosong"
+            android:textSize="14sp"
             android:textStyle="normal"
+            android:visibility="gone"
             android:gravity="center"/>
-    </LinearLayout>
 
-</FrameLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ly_card"
+            android:id="@+id/rv_produk"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="25dp" />
+
+    </LinearLayout>
+</layout>

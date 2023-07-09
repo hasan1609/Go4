@@ -154,27 +154,20 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
 
     override fun onStart() {
         super.onStart()
-
-        CartUtils.startCountDataListener("id_user")
-        CartUtils.setCountDataListener(object : CartUtils.CountDataListener {
+        val countDataListener = object : CartUtils.CountDataListener {
             override fun onCountUpdated(count: Long) {
-                if (count > 0) {
-                    binding.appBar.divAngka.visibility = View.VISIBLE
-                    binding.appBar.tvAngka.text = count.toString()
-                } else {
-                    binding.appBar.divAngka.visibility = View.GONE
+                if (count > 0){
+                    binding.appBar.divBadge.visibility = View.VISIBLE
+                }else{
+                    binding.appBar.divBadge.visibility = View.GONE
                 }
             }
 
             override fun onError(error: DatabaseError) {
-                // Tangani kesalahan jika ada
+                // Tangani kesalahan jika terjadi
             }
-        })
-    }
-
-    override fun onStop() {
-        super.onStop()
-        CartUtils.stopCountDataListener("id_user")
+        }
+        CartUtils.startCountDataListener("id_user", countDataListener)
     }
 
 }
