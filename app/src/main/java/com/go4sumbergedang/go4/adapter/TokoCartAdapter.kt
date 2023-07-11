@@ -20,13 +20,23 @@ class TokoCartAdapter(
 ) : RecyclerView.Adapter<TokoCartAdapter.ViewHolder>(){
 
     private var dialog: Dialog? = null
+    private var hapusDialog: OnDeleteClickListener? = null
     interface Dialog {
         fun onClick(position: Int, list : TokoItemModel)
+    }
+
+    interface OnDeleteClickListener {
+        fun onDeleteClick(position: Int, note: TokoItemModel)
+    }
+
+    fun setOnDeleteClickListener(listener: OnDeleteClickListener) {
+        this.hapusDialog = listener
     }
 
     fun setDialog(dialog: Dialog) {
         this.dialog = dialog
     }
+
     override fun getItemCount(): Int {
         return listData.size
     }
@@ -78,6 +88,11 @@ class TokoCartAdapter(
                 .load(urlImage+def)
                 .into(holder.foto)
         }
+
+        holder.hapus.setOnClickListener {
+            hapusDialog!!.onDeleteClick(position, list)
+        }
+
         holder.itemView.setOnClickListener {
             if (dialog!=null){
                 dialog!!.onClick(position,list)

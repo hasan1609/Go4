@@ -30,6 +30,7 @@ class KeranjangFragment : Fragment(), AnkoLogger {
     private val cartList: MutableList<TokoItemModel> = mutableListOf()
     private lateinit var progressDialog: ProgressDialog
     private lateinit var cartListener: ValueEventListener
+    var userId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,16 +45,16 @@ class KeranjangFragment : Fragment(), AnkoLogger {
             LinearLayoutManager.VERTICAL
         cartAdapter = TokoCartAdapter(cartList, requireActivity())
         binding.rvProduk.adapter = cartAdapter
-        getData("id_user")
+        userId = "id_user"
+        getData(userId.toString())
         return binding.root
     }
 
-    fun getData(userId: String) {
+    fun getData(id: String) {
         loading(true)
         val cartReference = FirebaseDatabase.getInstance().reference
             .child("cart")
-            .child(userId)
-
+            .child(id)
         cartListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 loading(false)
@@ -83,6 +84,11 @@ class KeranjangFragment : Fragment(), AnkoLogger {
                             startActivity<DetailKeranjangActivity>("detailCart" to noteJson)
                         }
                     })
+                    cartAdapter.setOnDeleteClickListener(object : TokoCartAdapter.OnDeleteClickListener {
+                        override fun onDeleteClick(position: Int, note: TokoItemModel) {
+                            deleteData(note.idToko.toString())
+                        }
+                    })
                     setSwipe()
                 }
             }
@@ -96,10 +102,25 @@ class KeranjangFragment : Fragment(), AnkoLogger {
         cartReference.addValueEventListener(cartListener)
     }
 
+    fun deleteData(idToko: String) {
+        FirebaseDatabase.getInstance().reference
+            .child("cart")
+            .child(userId.toString())
+            .child(idToko)
+            .removeValue()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    toast("Berhasil dihapus")
+                } else {
+                    toast("Gagal dihapus")
+                }
+            }
+    }
+
     private fun setSwipe() {
         ItemTouchHelper(object : ItemTouchHelper.Callback() {
 
-            private val limitScrollX = dipToPx(100f, requireActivity())
+            private val limitScrollX = dipToPx(60f, requireActivity())
             private var currentScrollX = 0
             private var currentScrollXWhenInActive = 0
             private var initXWhenInActive = 0f
@@ -193,7 +214,6 @@ class KeranjangFragment : Fragment(), AnkoLogger {
         return (dipValue * context.resources.displayMetrics.density).toInt()
     }
 
-
     private fun loading(isLoading: Boolean) {
         if (isLoading) {
             progressDialog.setMessage("Tunggu sebentar...")
@@ -206,10 +226,9 @@ class KeranjangFragment : Fragment(), AnkoLogger {
 
     override fun onPause() {
         super.onPause()
-        // Menghentikan pengambilan data dari realtime database saat fragment dijeda
         val cartReference = FirebaseDatabase.getInstance().reference
             .child("cart")
-            .child("id_user")
+            .child(userId.toString())
         cartReference.removeEventListener(cartListener)
     }
 }
