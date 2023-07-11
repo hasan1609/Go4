@@ -100,6 +100,7 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
                     cartItems[dataProduk.idProduk.toString()] = dataProduk
 
                     dataToko = TokoItemModel(
+                        idToko = "id_toko",
                         nama_toko = "ddsfgsjfgj",
                         foto = "gjfjdhfjdf",
                         cartItems = cartItems

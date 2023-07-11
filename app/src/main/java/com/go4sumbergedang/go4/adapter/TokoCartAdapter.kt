@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.TokoItemModel
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import java.lang.ref.WeakReference
 
 class TokoCartAdapter(
     private val listData: MutableList<TokoItemModel>,
@@ -33,11 +35,22 @@ class TokoCartAdapter(
         var foto: ImageView
         var nama_toko: TextView
         var jml_produk: TextView
+        var hapus: ImageView
+        private val vieww = WeakReference(view)
 
         init {
             foto = view.findViewById(R.id.foto_toko)
             nama_toko = view.findViewById(R.id.nama_toko)
             jml_produk = view.findViewById(R.id.jml_produk)
+            hapus = view.findViewById(R.id.ic_trash)
+            vieww.get()?.let {
+                it.setOnClickListener{
+//                    click to reset swip
+                    if (vieww.get()?.scrollX != 0){
+                        vieww.get()?.scrollTo(0,0)
+                    }
+                }
+            }
         }
     }
 
