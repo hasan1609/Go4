@@ -21,7 +21,7 @@ import kotlin.collections.ArrayList
 class CartAdapter (
     private val listData :MutableMap<String, CartModel>,
     private val context: Context
-) : RecyclerView.Adapter<CartAdapter.ViewHolder>(){
+) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
     private var dialog: Dialog? = null
     private var subTotal: Int = 0
@@ -31,12 +31,13 @@ class CartAdapter (
     }
 
     interface Dialog {
-        fun onClick(position: Int, list : CartModel)
+        fun onDelete(position: Int, list: CartModel)
     }
 
-    fun setDialog(dialog: Dialog) {
+    fun setDelete(dialog: Dialog) {
         this.dialog = dialog
     }
+
     override fun getItemCount(): Int {
         return listData.size
     }
@@ -56,6 +57,7 @@ class CartAdapter (
         var harga: TextView
         var keterangan: TextView
         var total: TextView
+        var hapus: ImageView
         private val vieww = WeakReference(view)
 
         init {
@@ -64,11 +66,12 @@ class CartAdapter (
             harga = view.findViewById(R.id.txt_harga)
             total = view.findViewById(R.id.txt_total)
             keterangan = view.findViewById(R.id.txt_ket)
+            hapus = view.findViewById(R.id.ic_trash)
             vieww.get()?.let {
-                it.setOnClickListener{
+                it.setOnClickListener {
 //                    click to reset swip
-                    if (vieww.get()?.scrollX != 0){
-                        vieww.get()?.scrollTo(0,0)
+                    if (vieww.get()?.scrollX != 0) {
+                        vieww.get()?.scrollTo(0, 0)
                     }
                 }
             }
@@ -106,24 +109,24 @@ class CartAdapter (
 
         subTotal += total.toInt()
 
-        if (cartModel.catatan == ""){
+        if (cartModel.catatan == "") {
             holder.keterangan.visibility = View.GONE
-        }else{
+        } else {
             holder.keterangan.visibility = View.VISIBLE
             holder.keterangan.text = cartModel.catatan
         }
         if (cartModel.fotoProduk != null) {
             Picasso.get()
-                .load(urlImage+foto)
+                .load(urlImage + foto)
                 .into(holder.foto)
-        }else{
+        } else {
             Picasso.get()
-                .load(urlImage+def)
+                .load(urlImage + def)
                 .into(holder.foto)
         }
-        holder.itemView.setOnClickListener {
-            if (dialog!=null){
-                dialog!!.onClick(position,cartModel)
+        holder.hapus.setOnClickListener {
+            if (dialog != null) {
+                dialog!!.onDelete(position, cartModel)
             }
         }
     }

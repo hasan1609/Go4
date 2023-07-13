@@ -11,24 +11,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.CartAdapter
-import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailKeranjangBinding
-import com.go4sumbergedang.go4.model.ProdukModel
+import com.go4sumbergedang.go4.model.CartModel
 import com.go4sumbergedang.go4.model.TokoItemModel
+import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.toast
 import java.text.DecimalFormat
 
 class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityDetailKeranjangBinding
     lateinit var detailCart: TokoItemModel
     private lateinit var cartAdapter: CartAdapter
-//    private val cartList: MutableList<TokoItemModel> = mutableListOf()
+    var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_keranjang)
         binding.lifecycleOwner = this
+        userId = "id_user"
         val gson = Gson()
         detailCart =
             gson.fromJson(intent.getStringExtra("detailCart"), TokoItemModel::class.java)
@@ -45,6 +48,11 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         cartAdapter = CartAdapter(detailCart.cartItems ?: mutableMapOf(), this)
         binding.rvCart.adapter = cartAdapter
         setSwipe()
+        cartAdapter.setDelete(object : CartAdapter.Dialog {
+            override fun onDelete(position: Int, list: CartModel) {
+                deleteData(list.idProduk.toString())
+            }
+        })
         cartAdapter.notifyDataSetChanged()
         val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
         val symbols = formatter.decimalFormatSymbols
@@ -53,6 +61,29 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         val totals = formatter.format(cartAdapter.getTotalJumlah())
 
         binding.txtSubTotalProduk.text = totals
+    }
+
+    private fun deleteData(idProduk: String) {
+        FirebaseDatabase.getInstance().reference
+            .child("cart")
+            .child(userId.toString())
+            .child(detailCart.idToko.toString())
+            .child("cartItems")
+            .child(idProduk)
+            .removeValue()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    toast(detailCart.idToko.toString())
+                } else {
+                    toast("Gagal dihapus")
+                }
+            }
+            .addOnFailureListener{ exception ->
+                toast(exception.message.toString())
+
+            }
+
+
     }
 
     private fun setSwipe() {
