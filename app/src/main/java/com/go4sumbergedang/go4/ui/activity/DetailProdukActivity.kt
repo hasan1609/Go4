@@ -22,11 +22,18 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
     var jumlah = 1
     private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
 
+    companion object {
+        const val namaToko = "namaToko"
+        const val fotoToko = "foto"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_produk)
         binding.lifecycleOwner = this
 
+        val namaTokoE = intent.getStringExtra(namaToko)
+        val fotoTokoE = intent.getStringExtra(fotoToko)
         val gson = Gson()
         detailProduk =
             gson.fromJson(intent.getStringExtra("detailProduk"), ProdukModel::class.java)
@@ -57,11 +64,11 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
             }
         }
         binding.btnKeranjang.setOnClickListener {
-            addToCart()
+            addToCart(namaTokoE.toString(), fotoTokoE.toString())
         }
     }
 
-    private fun addToCart() {
+    private fun addToCart(namaCart: String, fotoCart: String) {
         val dataProduk = CartModel()
         dataProduk.idProduk = detailProduk.idProduk.toString()
         dataProduk.namaProduk = detailProduk.namaProduk.toString()
@@ -101,8 +108,8 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
 
                     dataToko = TokoItemModel(
                         idToko = detailProduk.userId.toString(),
-                        nama_toko = "ddsfgsjfgj",
-                        foto = "gjfjdhfjdf",
+                        nama_toko = namaCart,
+                        foto = fotoCart,
                         cartItems = cartItems
                     )
                 }

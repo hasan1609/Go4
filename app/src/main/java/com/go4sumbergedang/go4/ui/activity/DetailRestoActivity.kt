@@ -18,10 +18,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.custom_appbar.view.*
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -91,13 +88,17 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
                             val groupedProduk = groupProdukByKategori(produkList as List<ProdukModel>)
                             binding.rvProduk.visibility = View.VISIBLE
                             binding.txtKosong.visibility = View.GONE
-                                mAdapter = ProdukAdapter(groupedProduk, this@DetailRestoActivity)
+                                mAdapter = ProdukAdapter(groupedProduk, dataResto,this@DetailRestoActivity)
                                 binding.rvProduk.adapter = mAdapter
                                 mAdapter.setDialog(object : ProdukAdapter.Dialog{
-                                    override fun onClick(position: Int, note: ProdukModel) {
+                                    override fun onClick(position: Int, namaToko: String, foto: String, produkModel: ProdukModel) {
                                         val gson = Gson()
-                                        val noteJson = gson.toJson(note)
-                                        startActivity<DetailProdukActivity>("detailProduk" to noteJson)
+                                        val noteJson = gson.toJson(produkModel)
+                                        val intent = intentFor<DetailProdukActivity>()
+                                            .putExtra("detailProduk", noteJson)
+                                            .putExtra("namaToko", namaToko)
+                                            .putExtra("foto", foto)
+                                        startActivity(intent)
                                     }
                                 })
                         }

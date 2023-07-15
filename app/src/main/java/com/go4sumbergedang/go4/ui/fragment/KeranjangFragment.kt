@@ -45,8 +45,6 @@ class KeranjangFragment : Fragment(), AnkoLogger {
             LinearLayoutManager.VERTICAL
         cartAdapter = TokoCartAdapter(cartList, requireActivity())
         binding.rvProduk.adapter = cartAdapter
-        userId = "id_user"
-        getData(userId.toString())
         return binding.root
     }
 
@@ -78,9 +76,9 @@ class KeranjangFragment : Fragment(), AnkoLogger {
                     // Update adapter
                     cartAdapter.notifyDataSetChanged()
                     cartAdapter.setDialog(object : TokoCartAdapter.Dialog {
-                        override fun onClick(position: Int, note: TokoItemModel) {
+                        override fun onClick(position: Int, list: TokoItemModel) {
                             val gson = Gson()
-                            val noteJson = gson.toJson(note)
+                            val noteJson = gson.toJson(list)
                             startActivity<DetailKeranjangActivity>("detailCart" to noteJson)
                         }
                     })
@@ -224,6 +222,11 @@ class KeranjangFragment : Fragment(), AnkoLogger {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        userId = "id_user"
+        getData(userId.toString())
+    }
     override fun onPause() {
         super.onPause()
         val cartReference = FirebaseDatabase.getInstance().reference

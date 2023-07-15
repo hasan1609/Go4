@@ -18,7 +18,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class CartAdapter (
-    private val listData :MutableMap<String, CartModel>,
+    private val listData :MutableList<CartModel>,
     private val context: Context
 ) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
@@ -43,7 +43,7 @@ class CartAdapter (
 
     private fun calculateSubTotal() {
         subTotal = 0
-        for (cartModel in listData.values) {
+        for (cartModel in listData) {
             val hargax = cartModel.harga?.toDoubleOrNull() ?: 0.0
             val jmlx = cartModel.jumlah ?: 0
             subTotal += (hargax * jmlx).toInt()
@@ -85,8 +85,7 @@ class CartAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val cartModelList = ArrayList(listData.values) // Mengubah map menjadi list
-        val cartModel = cartModelList[position]
+        val cartModel = listData[position]
         val urlImage = context.getString(R.string.urlImage)
         val foto = cartModel.fotoProduk.toString()
         var def = "/public/images/no_image.png"
