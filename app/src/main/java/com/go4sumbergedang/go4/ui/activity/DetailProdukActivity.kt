@@ -74,7 +74,7 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
         // Ambil data toko dari Firebase
         val cartReference = firebaseDatabase.reference.child("cart")
         val userIdReference = cartReference.child("id_user")
-        val tokoReference = userIdReference.child("id_toko2")
+        val tokoReference = userIdReference.child(detailProduk.userId.toString())
 
         // Ambil data toko dari Firebase
         tokoReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -100,7 +100,7 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
                     cartItems[dataProduk.idProduk.toString()] = dataProduk
 
                     dataToko = TokoItemModel(
-                        idToko = "id_toko",
+                        idToko = detailProduk.userId.toString(),
                         nama_toko = "ddsfgsjfgj",
                         foto = "gjfjdhfjdf",
                         cartItems = cartItems

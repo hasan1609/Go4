@@ -28,68 +28,69 @@ import retrofit2.Response
 
 class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
     private lateinit var binding: ActivityDetailRestoBinding
-    lateinit var detailResto: DetailRestoTerdekatModel
+    lateinit var tokoItemModel: TokoItemModel
     lateinit var mAdapter: ProdukAdapter
     private lateinit var progressDialog: ProgressDialog
     var api = ApiClient.instance()
+
+    companion object {
+        const val idToko = "detailToko"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_resto)
         binding.lifecycleOwner = this
         progressDialog = ProgressDialog(this)
+        val data = intent.getStringExtra(idToko)
+
         binding.appBar.titleTextView.text = "Data Produk"
         binding.appBar.backButton.setOnClickListener{
             onBackPressed()
         }
 
-        val gson = Gson()
-        detailResto =
-            gson.fromJson(intent.getStringExtra("detailResto"), DetailRestoTerdekatModel::class.java)
-
-        val urlImage = this.getString(R.string.urlImage)
-        val fotoResto = detailResto.foto.toString()
-        var def = "/public/images/no_image.png"
-        if (detailResto.foto != null) {
-            Picasso.get()
-                .load(urlImage+fotoResto)
-                .into(binding.fotoResto)
-        }else{
-            Picasso.get()
-                .load(urlImage+def)
-                .into(binding.fotoResto)
-        }
-        binding.txtNamaResto.text = detailResto.namaResto
-        binding.txtJarak.text = detailResto.distance.toString() + "KM"
-
-        getData(detailResto.userId.toString())
+        getData(data.toString(), "-7.649166","112.682555")
     }
 
-
-    private fun getData(id: String) {
+    private fun getData(id: String, lat: String, long:String) {
         binding.rvProduk.layoutManager = LinearLayoutManager(this)
         binding.rvProduk.setHasFixedSize(true)
         (binding.rvProduk.layoutManager as LinearLayoutManager).orientation =
             LinearLayoutManager.VERTICAL
         loading(true)
-        api.getProdukByIdResto(id).enqueue(object : Callback<ResponseProduk> {
+        api.getProdukByIdResto(id, lat, long).enqueue(object : Callback<ResponseResto> {
             override fun onResponse(
-                call: Call<ResponseProduk>,
-                response: Response<ResponseProduk>
+                call: Call<ResponseResto>,
+                response: Response<ResponseResto>
             ) {
                 try {
                     if (response.isSuccessful) {
                         loading(false)
                         val data = response.body()
-                        if (data?.status == true) {
-                            if (data.data!!.isEmpty()){
-                                binding.rvProduk.visibility = View.GONE
-                                binding.txtKosong.visibility = View.VISIBLE
-                            }else{
-                                val produkList = data.data ?: emptyList<ProdukModel>()
-                                val groupedProduk = groupProdukByKategori(produkList as List<ProdukModel>)
-                                binding.rvProduk.visibility = View.VISIBLE
-                                binding.txtKosong.visibility = View.GONE
+                        val dataResto = data!!.data!!.get(0)!!
+                        val urlImage = getString(R.string.urlImage)
+                        var def = "/public/images/no_image.png"
+                        val  fotoResto = dataResto.foto
+                        if (data.data!![0]!!.foto != null) {
+                            Picasso.get()
+                                .load(urlImage+fotoResto)
+                                .into(binding.fotoResto)
+                        }else{
+                            Picasso.get()
+                                .load(urlImage+def)
+                                .into(binding.fotoResto)
+                        }
+                        binding.txtNamaResto.text = dataResto.namaResto
+                        binding.txtJarak.text = dataResto.distance.toString() + " KM"
+
+                        if (dataResto.produk!!.isEmpty()){
+                            binding.rvProduk.visibility = View.GONE
+                            binding.txtKosong.visibility = View.VISIBLE
+                        }else{
+                            val produkList = dataResto.produk ?: emptyList<ProdukModel>()
+                            val groupedProduk = groupProdukByKategori(produkList as List<ProdukModel>)
+                            binding.rvProduk.visibility = View.VISIBLE
+                            binding.txtKosong.visibility = View.GONE
                                 mAdapter = ProdukAdapter(groupedProduk, this@DetailRestoActivity)
                                 binding.rvProduk.adapter = mAdapter
                                 mAdapter.setDialog(object : ProdukAdapter.Dialog{
@@ -99,7 +100,6 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
                                         startActivity<DetailProdukActivity>("detailProduk" to noteJson)
                                     }
                                 })
-                            }
                         }
                     } else {
                         loading(false)
@@ -111,7 +111,7 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
                     toast(e.message.toString())
                 }
             }
-            override fun onFailure(call: Call<ResponseProduk>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseResto>, t: Throwable) {
                 loading(false)
                 info { "hasan ${t.message}" }
                 toast(t.message.toString())
@@ -152,6 +152,9 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+    }
     override fun onStart() {
         super.onStart()
         val countDataListener = object : CartUtils.CountDataListener {

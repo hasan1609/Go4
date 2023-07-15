@@ -1,7 +1,6 @@
 package com.go4sumbergedang.go4.webservices
 
-import com.go4sumbergedang.go4.model.ResponseProduk
-import com.go4sumbergedang.go4.model.ResponseRestoTerdekat
+import com.go4sumbergedang.go4.model.ResponseResto
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -12,10 +11,12 @@ interface ApiService {
     fun getRestoTerdekat(
         @Path("latitude") latitude: String,
         @Path("longitude") longitude: String
-    ): Call<ResponseRestoTerdekat>
+    ): Call<ResponseResto>
 
-    @GET("resto/produk/{id}")
+    @GET("resto/produk/{id}/{lat}&{long}")
     fun getProdukByIdResto(
         @Path("id") id: String,
-    ): Call<ResponseProduk>
+        @Path("lat") lat: String,
+        @Path("long") long: String,
+    ): Call<ResponseResto>
 }

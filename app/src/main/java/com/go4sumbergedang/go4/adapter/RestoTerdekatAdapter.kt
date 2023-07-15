@@ -7,18 +7,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.model.DetailRestoTerdekatModel
+import com.go4sumbergedang.go4.model.RestoModel
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
 class RestoTerdekatAdapter (
-    private val listData :MutableList<DetailRestoTerdekatModel>,
+    private val listData :MutableList<RestoModel>,
     private val context: Context
 ) : RecyclerView.Adapter<RestoTerdekatAdapter.ViewHolder>(){
 
     private var dialog: Dialog? = null
     interface Dialog {
-        fun onClick(position: Int, list : DetailRestoTerdekatModel)
+        fun onClick(position: Int, idToko : String)
     }
 
     fun setDialog(dialog: Dialog) {
@@ -69,7 +69,7 @@ class RestoTerdekatAdapter (
         }
         holder.itemView.setOnClickListener {
             if (dialog!=null){
-                dialog!!.onClick(position,list)
+                dialog!!.onClick(position, list.userId.toString())
             }
         }
     }

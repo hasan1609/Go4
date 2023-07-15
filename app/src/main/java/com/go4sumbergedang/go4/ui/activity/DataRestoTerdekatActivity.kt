@@ -10,17 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDataRestoTerdekatBinding
-import com.go4sumbergedang.go4.model.DetailRestoTerdekatModel
-import com.go4sumbergedang.go4.model.ResponseRestoTerdekat
+import com.go4sumbergedang.go4.model.ResponseResto
+import com.go4sumbergedang.go4.model.RestoModel
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseError
 import com.google.gson.Gson
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -65,15 +62,15 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         (binding.rvRestoTerdekat.layoutManager as LinearLayoutManager).orientation =
             LinearLayoutManager.VERTICAL
         loading(true)
-        api.getRestoTerdekat(latitude, longitude).enqueue(object : Callback<ResponseRestoTerdekat> {
+        api.getRestoTerdekat(latitude, longitude).enqueue(object : Callback<ResponseResto> {
             override fun onResponse(
-                call: Call<ResponseRestoTerdekat>,
-                response: Response<ResponseRestoTerdekat>
+                call: Call<ResponseResto>,
+                response: Response<ResponseResto>
             ) {
                 try {
                     if (response.isSuccessful) {
                         loading(false)
-                        val notesList = mutableListOf<DetailRestoTerdekatModel>()
+                        val notesList = mutableListOf<RestoModel>()
                         val data = response.body()
                         if (data!!.status == true) {
                             loading(false)
@@ -88,10 +85,10 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
                                     binding.txtKosong.visibility = View.GONE
                                     binding.rvRestoTerdekat.adapter = mAdapter
                                     mAdapter.setDialog(object : RestoTerdekatAdapter.Dialog{
-                                        override fun onClick(position: Int, note: DetailRestoTerdekatModel) {
-                                            val gson = Gson()
-                                            val noteJson = gson.toJson(note)
-                                            startActivity<DetailRestoActivity>("detailResto" to noteJson)
+                                        override fun onClick(position: Int, idToko: String) {
+                                            val intent = intentFor<DetailRestoActivity>()
+                                                .putExtra("detailToko", idToko)
+                                            startActivity(intent)
                                         }
                                     })
                                     mAdapter.notifyDataSetChanged()
@@ -108,7 +105,7 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
                     toast(e.message.toString())
                 }
             }
-            override fun onFailure(call: Call<ResponseRestoTerdekat>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseResto>, t: Throwable) {
                 loading(false)
                 info { "hasan ${t.message}" }
                 toast(t.message.toString())

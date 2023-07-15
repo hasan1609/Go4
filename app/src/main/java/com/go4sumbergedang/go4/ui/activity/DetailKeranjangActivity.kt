@@ -17,6 +17,8 @@ import com.go4sumbergedang.go4.model.TokoItemModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.intentFor
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.toast
 import java.text.DecimalFormat
@@ -40,7 +42,11 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
-
+        binding.txtTambah.setOnClickListener {
+            val intent = intentFor<DetailRestoActivity>()
+                .putExtra("detailToko", detailCart.idToko.toString())
+            startActivity(intent)
+        }
         binding.rvCart.layoutManager = LinearLayoutManager(this)
         binding.rvCart.setHasFixedSize(true)
         (binding.rvCart.layoutManager as LinearLayoutManager).orientation =
