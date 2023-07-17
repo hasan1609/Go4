@@ -18,6 +18,9 @@ data class CartModel(
     @field:SerializedName("kategori")
     var kategori: String? = null,
 
+    @field:SerializedName("keterangan")
+    var keterangan: String? = null,
+
     @field:SerializedName("foto_produk")
     var fotoProduk: String? = null,
 

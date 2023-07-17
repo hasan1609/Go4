@@ -31,7 +31,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var detailCart: TokoItemModel
     private lateinit var cartAdapter: CartAdapter
     private lateinit var progressDialog: ProgressDialog
-    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var cartListener: ValueEventListener
     private val cartItems = mutableListOf<CartModel>()
 
@@ -182,11 +181,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         return (dipValue * context.resources.displayMetrics.density).toInt()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-    }
-
     private fun getData(idUser: String, idToko: String) {
         loading(true)
         binding.rvCart.layoutManager = LinearLayoutManager(this)
@@ -212,9 +206,27 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 cartAdapter = CartAdapter(cartItems, this@DetailKeranjangActivity)
                 binding.rvCart.adapter = cartAdapter
                 setSwipe()
-                cartAdapter.setDelete(object : CartAdapter.Dialog {
+
+                cartAdapter.setClick(object : CartAdapter.Dialog {
                     override fun onDelete(position: Int, list: CartModel) {
                         deleteData(list.idProduk.toString())
+                    }
+
+                    override fun onClick(position: Int, list: CartModel) {
+                        val intent = intentFor<DetailProdukActivity>()
+                            .putExtra("idProduk", list.idProduk)
+                            .putExtra("namaProduk", list.namaProduk)
+                            .putExtra("hargaProduk", list.harga)
+                            .putExtra("fotoProduk", list.fotoProduk)
+                            .putExtra("keteranganProduk", list.keterangan)
+                            .putExtra("kategoriProduk", list.kategori)
+                            .putExtra("idResto", detailCart.idToko)
+                            .putExtra("catatan", list.catatan)
+                            .putExtra("namaToko", detailCart.nama_toko)
+                            .putExtra("foto", detailCart.foto)
+                            .putExtra("keterangan", list.keterangan)
+                            .putExtra("jumlahProduk", list.jumlah.toString())
+                        startActivity(intent)
                     }
                 })
                 updateCartItems()
@@ -235,6 +247,9 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         formatter.decimalFormatSymbols = symbols
         val totals = formatter.format(cartAdapter.getTotalJumlah())
         binding.txtSubTotalProduk.text = totals
+        val ongkos = 10000
+        val all = cartAdapter.getTotalJumlah() + ongkos
+        binding.txtTotalAll.text = formatter.format(all)
     }
 
 

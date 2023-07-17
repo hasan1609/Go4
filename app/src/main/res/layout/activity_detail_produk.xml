@@ -137,34 +137,18 @@
                 </LinearLayout>
             </RelativeLayout>
         </ScrollView>
-        <LinearLayout
+
+        <Button
+            android:id="@+id/btnKeranjang"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:padding="10dp"
             android:layout_alignParentBottom="true"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnKeranjang"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="10dp"
-                android:textColor="@color/black"
-                app:strokeColor="@color/primary_color"
-                app:iconTint="@color/black"
-                style="@style/Widget.App.Button.OutlinedButton.IconOnly"
-                app:icon="@drawable/ic_cart_plus"/>
-
-            <Button
-                android:id="@+id/btnBeli"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/primary_color"
-                android:text="Beli" />
-
-        </LinearLayout>
+            android:layout_gravity="center"
+            android:layout_margin="20dp"
+            android:padding="15dp"
+            android:textSize="15sp"
+            android:text="Tambah Keranjang"
+            android:textColor="@color/white" />
     </RelativeLayout>
 </layout>
 

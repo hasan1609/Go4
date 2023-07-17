@@ -1,51 +1,54 @@
-package com.go4sumbergedang.go4.ui.fragment
+package com.go4sumbergedang.go4.ui.activity
 
 import android.app.ProgressDialog
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.TokoCartAdapter
-import com.go4sumbergedang.go4.databinding.FragmentKeranjangBinding
+import com.go4sumbergedang.go4.databinding.ActivityKeranjangBinding
 import com.go4sumbergedang.go4.model.TokoItemModel
-import com.go4sumbergedang.go4.ui.activity.DetailKeranjangActivity
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.support.v4.startActivity
-import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.toast
 
-
-class KeranjangFragment : Fragment(), AnkoLogger {
-    private lateinit var binding: FragmentKeranjangBinding
+class KeranjangActivity : AppCompatActivity(), AnkoLogger {
+    private lateinit var binding: ActivityKeranjangBinding
     private lateinit var cartAdapter: TokoCartAdapter
     private val cartList: MutableList<TokoItemModel> = mutableListOf()
     private lateinit var progressDialog: ProgressDialog
     private lateinit var cartListener: ValueEventListener
     var userId: String? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_keranjang, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_keranjang)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_keranjang)
         binding.lifecycleOwner = this
-        progressDialog = ProgressDialog(requireActivity())
-        binding.rvProduk.layoutManager = LinearLayoutManager(requireActivity())
+        progressDialog = ProgressDialog(this)
+        binding.appBar.btnToKeranjang.visibility = View.GONE
+        binding.appBar.titleTextView.text = "Keranjang"
+        binding.appBar.backButton.setOnClickListener {
+            onBackPressed()
+        }
+
+        binding.rvProduk.layoutManager = LinearLayoutManager(this)
         binding.rvProduk.setHasFixedSize(true)
         (binding.rvProduk.layoutManager as LinearLayoutManager).orientation =
             LinearLayoutManager.VERTICAL
-        cartAdapter = TokoCartAdapter(cartList, requireActivity())
+        cartAdapter = TokoCartAdapter(cartList, this)
         binding.rvProduk.adapter = cartAdapter
-        return binding.root
     }
 
     fun getData(id: String) {
@@ -118,7 +121,7 @@ class KeranjangFragment : Fragment(), AnkoLogger {
     private fun setSwipe() {
         ItemTouchHelper(object : ItemTouchHelper.Callback() {
 
-            private val limitScrollX = dipToPx(60f, requireActivity())
+            private val limitScrollX = dipToPx(60f, this@KeranjangActivity)
             private var currentScrollX = 0
             private var currentScrollXWhenInActive = 0
             private var initXWhenInActive = 0f

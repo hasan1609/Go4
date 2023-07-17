@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.ui.fragment.HomeFragment
-import com.go4sumbergedang.go4.ui.fragment.KeranjangFragment
+import com.go4sumbergedang.go4.ui.fragment.NotificationFragment
 import com.go4sumbergedang.go4.ui.fragment.ProfilFragment
 import com.go4sumbergedang.go4.ui.fragment.TransaksiFragment
 
@@ -22,10 +22,10 @@ class RootActivity : AppCompatActivity() {
                     ).commit()
                     return@OnNavigationItemSelectedListener true
                 }
-                R.id.navigation_keranjang -> {
+                R.id.navigation_notifikasi -> {
                     supportFragmentManager.beginTransaction().replace(
                         R.id.frameHome,
-                        KeranjangFragment()
+                        NotificationFragment()
                     ).commit()
                     return@OnNavigationItemSelectedListener true
                 }

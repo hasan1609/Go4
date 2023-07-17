@@ -41,14 +41,31 @@
                     android:text="NAMA User"
                     android:textSize="17sp"
                     android:textStyle="bold" />
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
+
+                <RelativeLayout
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="15dp"
-                    android:src="@drawable/ic_notifications"
-                    android:layout_gravity="center"/>
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:id="@+id/btn_toKeranjang"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp">
+
+                    <ImageView
+                        android:id="@+id/img"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/ic_cart"/>
+
+                    <RelativeLayout
+                        android:id="@+id/div_badge"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_alignParentRight="true"
+                        android:visibility="gone"
+                        android:background="@drawable/badge_background">
+                    </RelativeLayout>
+                </RelativeLayout>
             </RelativeLayout>
 
             <TextView

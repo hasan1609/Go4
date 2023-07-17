@@ -45,6 +45,9 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
         binding.appBar.backButton.setOnClickListener{
             onBackPressed()
         }
+        binding.appBar.btnToKeranjang.setOnClickListener {
+            startActivity<KeranjangActivity>()
+        }
 
         getData(data.toString(), "-7.649166","112.682555")
     }
@@ -81,9 +84,11 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
                         binding.txtJarak.text = dataResto.distance.toString() + " KM"
 
                         if (dataResto.produk!!.isEmpty()){
+                            loading(false)
                             binding.rvProduk.visibility = View.GONE
                             binding.txtKosong.visibility = View.VISIBLE
                         }else{
+                            loading(false)
                             val produkList = dataResto.produk ?: emptyList<ProdukModel>()
                             val groupedProduk = groupProdukByKategori(produkList as List<ProdukModel>)
                             binding.rvProduk.visibility = View.VISIBLE
@@ -92,10 +97,14 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
                                 binding.rvProduk.adapter = mAdapter
                                 mAdapter.setDialog(object : ProdukAdapter.Dialog{
                                     override fun onClick(position: Int, namaToko: String, foto: String, produkModel: ProdukModel) {
-                                        val gson = Gson()
-                                        val noteJson = gson.toJson(produkModel)
                                         val intent = intentFor<DetailProdukActivity>()
-                                            .putExtra("detailProduk", noteJson)
+                                            .putExtra("idProduk", produkModel.idProduk)
+                                            .putExtra("namaProduk", produkModel.namaProduk)
+                                            .putExtra("hargaProduk", produkModel.harga)
+                                            .putExtra("fotoProduk", produkModel.fotoProduk)
+                                            .putExtra("keteranganProduk", produkModel.keterangan)
+                                            .putExtra("kategoriProduk", produkModel.kategori)
+                                            .putExtra("idResto", produkModel.userId)
                                             .putExtra("namaToko", namaToko)
                                             .putExtra("foto", foto)
                                         startActivity(intent)

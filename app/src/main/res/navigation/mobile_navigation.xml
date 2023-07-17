@@ -11,10 +11,10 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
-        android:id="@+id/keranjangFragment"
-        android:name="com.go4sumbergedang.go4.ui.fragment.KeranjangFragment"
-        android:label="fragment_keranjang"
-        tools:layout="@layout/fragment_keranjang" />
+        android:id="@+id/notifikasiFragment"
+        android:name="com.go4sumbergedang.go4.ui.fragment.NotificationFragment"
+        android:label="fragment_notifikasi"
+        tools:layout="@layout/fragment_notification" />
     <fragment
         android:id="@+id/transaksiFragment"
         android:name="com.go4sumbergedang.go4.ui.fragment.TransaksiFragment"

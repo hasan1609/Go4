@@ -37,6 +37,9 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener{
             finish()
         }
+        binding.appBar.btnToKeranjang.setOnClickListener {
+            startActivity<KeranjangActivity>()
+        }
         getData("-7.649166","112.682555")
 
         val countDataListener = object : CartUtils.CountDataListener {
@@ -75,9 +78,11 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
                         if (data!!.status == true) {
                             loading(false)
                             if (data.data!!.isEmpty()){
+                                loading(false)
                                 binding.rvRestoTerdekat.visibility = View.GONE
                                 binding.txtKosong.visibility = View.VISIBLE
                             }else{
+                                loading(false)
                                 for (hasil in data.data) {
                                     notesList.add(hasil!!)
                                     mAdapter = RestoTerdekatAdapter(notesList, this@DataRestoTerdekatActivity)

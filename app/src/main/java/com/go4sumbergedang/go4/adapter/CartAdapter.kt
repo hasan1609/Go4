@@ -31,9 +31,10 @@ class CartAdapter (
 
     interface Dialog {
         fun onDelete(position: Int, list: CartModel)
+        fun onClick(position: Int, list: CartModel)
     }
 
-    fun setDelete(dialog: Dialog) {
+    fun setClick(dialog: Dialog) {
         this.dialog = dialog
     }
 
@@ -125,6 +126,12 @@ class CartAdapter (
         holder.hapus.setOnClickListener {
             if (dialog != null) {
                 dialog!!.onDelete(position, cartModel)
+            }
+        }
+
+        holder.itemView.setOnClickListener {
+            if (dialog != null) {
+                dialog!!.onClick(position, cartModel)
             }
         }
     }

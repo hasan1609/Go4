@@ -7,24 +7,40 @@ import androidx.databinding.DataBindingUtil
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.ActivityDetailProdukBinding
 import com.go4sumbergedang.go4.model.CartModel
-import com.go4sumbergedang.go4.model.ProdukModel
 import com.go4sumbergedang.go4.model.TokoItemModel
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.google.firebase.database.*
-import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 
 class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
     private lateinit var binding: ActivityDetailProdukBinding
-    lateinit var detailProduk: ProdukModel
-    var jumlah = 1
     private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()
+    var namaTokoE: String? = null
+    var fotoTokoE: String? = null
+    var idProdukE: String? = null
+    var namaProdukE: String? = null
+    var hargaProdukE: String? = null
+    var fotoProdukE: String? = null
+    var keteranganProdukE: String? = null
+    var idRestoE: String? = null
+    var kategoriProdukE: String? = null
+    var jumlahProdukE: Int? = null
+    var catatanE: String? = null
 
     companion object {
         const val namaToko = "namaToko"
         const val fotoToko = "foto"
+        const val idProduk = "idProduk"
+        const val namaProduk = "namaProduk"
+        const val hargaProduk = "hargaProduk"
+        const val fotoProduk = "fotoProduk"
+        const val keteranganProduk = "keteranganProduk"
+        const val kategoriProduk = "kategoriProduk"
+        const val idResto = "idResto"
+        const val jumlahProduk = "jumlahProduk"
+        const val catatan = "catatan"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,56 +48,80 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_produk)
         binding.lifecycleOwner = this
 
-        val namaTokoE = intent.getStringExtra(namaToko)
-        val fotoTokoE = intent.getStringExtra(fotoToko)
-        val gson = Gson()
-        detailProduk =
-            gson.fromJson(intent.getStringExtra("detailProduk"), ProdukModel::class.java)
+        namaTokoE = intent.getStringExtra(namaToko)
+        fotoTokoE = intent.getStringExtra(fotoToko)
+        idProdukE = intent.getStringExtra(idProduk)
+        namaProdukE = intent.getStringExtra(namaProduk)
+        hargaProdukE = intent.getStringExtra(hargaProduk)
+        fotoProdukE = intent.getStringExtra(fotoProduk)
+        keteranganProdukE = intent.getStringExtra(keteranganProduk)
+        idRestoE = intent.getStringExtra(idResto)
+        kategoriProdukE = intent.getStringExtra(kategoriProduk)
+        jumlahProdukE = intent.getStringExtra(jumlahProduk)?.toIntOrNull() ?: 1
+        catatanE = intent.getStringExtra(catatan)
 
         binding.appBar.titleTextView.text = "Detail Produk"
         binding.appBar.backButton.setOnClickListener{
             onBackPressed()
         }
-        binding.txtNamaProduk.text = detailProduk.namaProduk
-        binding.txtHargaProduk.text = detailProduk.harga
-        binding.edtJumlah.setText(jumlah.toString())
-        if(detailProduk.keterangan != null) {
+        binding.appBar.btnToKeranjang.setOnClickListener {
+            startActivity<KeranjangActivity>()
+        }
+        binding.txtNamaProduk.text = namaProdukE
+        binding.txtHargaProduk.text = hargaProdukE
+        if(keteranganProdukE != null) {
             binding.txtKetProduk.visibility = View.VISIBLE
-            binding.txtKetProduk.text = detailProduk.keterangan
+            binding.txtKetProduk.text = keteranganProdukE
         }else{
             binding.txtKetProduk.visibility = View.GONE
-            binding.txtKetProduk.text = detailProduk.keterangan
         }
 
-        binding.icPlus.setOnClickListener{
-            jumlah++
-            binding.edtJumlah.setText(jumlah.toString())
+        if (catatanE != null){
+            binding.edtCatatan.setText(catatanE)
         }
-        binding.icMin.setOnClickListener{
-            if (jumlah > 1){
-                jumlah--
-                binding.edtJumlah.setText(jumlah.toString())
+
+        binding.edtJumlah.setText(jumlahProdukE.toString())
+
+        binding.icPlus.setOnClickListener {
+            jumlahProdukE?.let {
+                jumlahProdukE = it + 1
+                binding.edtJumlah.setText(jumlahProdukE.toString())
             }
         }
+
+        binding.icMin.setOnClickListener {
+            jumlahProdukE?.let {
+                if (it > 1) {
+                    jumlahProdukE = it - 1
+                    binding.edtJumlah.setText(jumlahProdukE.toString())
+                }
+            }
+        }
+
         binding.btnKeranjang.setOnClickListener {
-            addToCart(namaTokoE.toString(), fotoTokoE.toString())
+            if (namaTokoE == null && fotoTokoE == null){
+                toast("kosong")
+            }else{
+                addToCart(namaTokoE.toString(), fotoTokoE.toString())
+            }
         }
     }
 
     private fun addToCart(namaCart: String, fotoCart: String) {
         val dataProduk = CartModel()
-        dataProduk.idProduk = detailProduk.idProduk.toString()
-        dataProduk.namaProduk = detailProduk.namaProduk.toString()
-        dataProduk.harga = detailProduk.harga.toString()
-        dataProduk.kategori = detailProduk.kategori.toString()
-        dataProduk.fotoProduk = detailProduk.fotoProduk.toString()
+        dataProduk.idProduk = idProdukE
+        dataProduk.namaProduk = namaProdukE
+        dataProduk.harga = hargaProdukE
+        dataProduk.kategori = kategoriProdukE
+        dataProduk.keterangan = keteranganProdukE
+        dataProduk.fotoProduk = fotoProdukE
         dataProduk.jumlah = binding.edtJumlah.text.toString().toInt()
         dataProduk.catatan = binding.edtCatatan.text.toString()
 
         // Ambil data toko dari Firebase
         val cartReference = firebaseDatabase.reference.child("cart")
         val userIdReference = cartReference.child("id_user")
-        val tokoReference = userIdReference.child(detailProduk.userId.toString())
+        val tokoReference = userIdReference.child(idRestoE.toString())
 
         // Ambil data toko dari Firebase
         tokoReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -96,7 +136,12 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
                         // Jika item cart dengan key yang sama sudah ada, tambahkan jumlahnya
                         val existingProduk = cartItems[dataProduk.idProduk]
                         val existingJumlah = existingProduk?.jumlah ?: 0
-                        existingProduk?.jumlah = existingJumlah + dataProduk.jumlah!!
+                        existingProduk?.catatan = dataProduk.catatan
+                        if (jumlahProdukE != 1){
+                            existingProduk?.jumlah = dataProduk.jumlah
+                        }else{
+                            existingProduk?.jumlah =  dataProduk.jumlah!! + existingJumlah
+                        }
                     } else {
                         // Jika item cart belum ada, tambahkan ke dalam list cartItems
                         cartItems?.put(dataProduk.idProduk.toString(), dataProduk)
@@ -107,7 +152,7 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
                     cartItems[dataProduk.idProduk.toString()] = dataProduk
 
                     dataToko = TokoItemModel(
-                        idToko = detailProduk.userId.toString(),
+                        idToko = idRestoE.toString(),
                         nama_toko = namaCart,
                         foto = fotoCart,
                         cartItems = cartItems

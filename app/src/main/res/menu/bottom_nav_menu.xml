@@ -7,9 +7,9 @@
         android:title="@string/title_home"/>
 
     <item
-        android:id="@+id/navigation_keranjang"
-        android:icon="@drawable/ic_cart"
-        android:title="@string/title_keranjang"/>
+        android:id="@+id/navigation_notifikasi"
+        android:icon="@drawable/ic_notifications"
+        android:title="@string/title_notifikasi"/>
 
     <item
         android:id="@+id/navigation_transaksi"
