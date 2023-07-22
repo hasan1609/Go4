@@ -42,4 +42,13 @@ class NotificationFragment : Fragment(), AnkoLogger {
         return binding.root
     }
 
+    private fun loading(isLoading: Boolean) {
+        if (isLoading) {
+            progressDialog.setMessage("Tunggu sebentar...")
+            progressDialog.setCancelable(false)
+            progressDialog.show()
+        } else {
+            progressDialog.dismiss()
+        }
+    }
 }

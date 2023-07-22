@@ -1,7 +1,9 @@
 package com.go4sumbergedang.go4.ui.activity
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Canvas
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -42,7 +44,6 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
-
         binding.rvProduk.layoutManager = LinearLayoutManager(this)
         binding.rvProduk.setHasFixedSize(true)
         (binding.rvProduk.layoutManager as LinearLayoutManager).orientation =
@@ -75,7 +76,6 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                     // Jika ada data, tampilkan RecyclerView
                     binding.txtKosong.visibility = View.GONE
                     binding.rvProduk.visibility = View.VISIBLE
-
                     // Update adapter
                     cartAdapter.notifyDataSetChanged()
                     cartAdapter.setDialog(object : TokoCartAdapter.Dialog {
@@ -87,7 +87,17 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                     })
                     cartAdapter.setOnDeleteClickListener(object : TokoCartAdapter.OnDeleteClickListener {
                         override fun onDeleteClick(position: Int, note: TokoItemModel) {
-                            deleteData(note.idToko.toString())
+                            val builder: AlertDialog.Builder = AlertDialog.Builder(this@KeranjangActivity)
+                            builder.setTitle("Hapus Keranjang")
+                            builder.setPositiveButton("Ya",
+                                DialogInterface.OnClickListener { _, _ ->
+                                    deleteData(note.idToko.toString())
+                                })
+                            builder.setNegativeButton("Batal",
+                                DialogInterface.OnClickListener { dialogInterface, _ ->
+                                    dialogInterface.cancel()
+                                })
+                            builder.show()
                         }
                     })
                     setSwipe()
@@ -99,7 +109,6 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                 toast("Gagal mendapatkan data")
             }
         }
-
         cartReference.addValueEventListener(cartListener)
     }
 
@@ -230,6 +239,7 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
         userId = "id_user"
         getData(userId.toString())
     }
+
     override fun onPause() {
         super.onPause()
         val cartReference = FirebaseDatabase.getInstance().reference

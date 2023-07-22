@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="4dp"
+    app:cardCornerRadius="10dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="25dp"
+        android:paddingVertical="10dp"
+        android:gravity="center">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/pg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/primary_color" />
+
+            <TextView
+                android:id="@+id/txt_tunggu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Harap Tunggu"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="3dp"
+                android:layout_toEndOf="@+id/pg"/>
+
+            <TextView
+                android:id="@+id/txt_cari"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sedang mencari driver"
+                android:textSize="14sp"
+                android:layout_marginStart="20dp"
+                android:layout_below="@+id/txt_tunggu"
+                android:layout_toEndOf="@+id/pg"/>
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_batal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="batal"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

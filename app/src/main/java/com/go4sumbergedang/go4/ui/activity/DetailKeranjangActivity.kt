@@ -1,7 +1,9 @@
 package com.go4sumbergedang.go4.ui.activity
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Canvas
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,14 +18,12 @@ import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailKeranjangBinding
 import com.go4sumbergedang.go4.model.CartModel
 import com.go4sumbergedang.go4.model.TokoItemModel
+import com.go4sumbergedang.go4.utils.LoadingDialogSearch
 import com.google.firebase.database.*
 import com.google.gson.Gson
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.intentFor
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.*
 import org.jetbrains.anko.support.v4.startActivity
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.toast
 import java.text.DecimalFormat
 
 class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
@@ -31,9 +31,9 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var detailCart: TokoItemModel
     private lateinit var cartAdapter: CartAdapter
     private lateinit var progressDialog: ProgressDialog
+    private var loadingDialog: LoadingDialogSearch? = null
     private lateinit var cartListener: ValueEventListener
     private val cartItems = mutableListOf<CartModel>()
-
     var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,33 +55,54 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 .putExtra("detailToko", detailCart.idToko.toString())
             startActivity(intent)
         }
-
-
         getData(userId.toString(), detailCart.idToko.toString())
+
+        binding.btnBeli.setOnClickListener {
+            showLoadingDialog()
+            main()
+        }
+        dismissLoadingDialog()
     }
 
     private fun deleteData(idProduk: String) {
-        FirebaseDatabase.getInstance().reference
+        val cartReference = FirebaseDatabase.getInstance().reference
             .child("cart")
             .child(userId.toString())
             .child(detailCart.idToko.toString())
-            .child("cartItems")
-            .child(idProduk)
-            .removeValue()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    toast("data dihapus")
-                    updateCartItems()
+
+        cartReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val cartItemsCount = dataSnapshot.child("cartItems").childrenCount.toInt()
+                if (cartItemsCount == 1) {
+                    // Hapus data cartItems dan id_toko
+                    cartReference.removeValue()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                toast("Berhasil dihapus")
+                                finish()
+                            } else {
+                                toast("Gagal dihapus")
+                            }
+                        }
                 } else {
-                    toast("Gagal dihapus")
+                    // Hapus data cartItems saja
+                    cartReference.child("cartItems")
+                        .child(idProduk)
+                        .removeValue()
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                toast("Berhasil dihapus")
+                            } else {
+                                toast("Gagal dihapus")
+                            }
+                        }
                 }
             }
-            .addOnFailureListener{ exception ->
-                toast(exception.message.toString())
 
+            override fun onCancelled(databaseError: DatabaseError) {
+                toast("Gagal mendapatkan data")
             }
-
-
+        })
     }
 
     private fun setSwipe() {
@@ -209,7 +230,17 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
 
                 cartAdapter.setClick(object : CartAdapter.Dialog {
                     override fun onDelete(position: Int, list: CartModel) {
-                        deleteData(list.idProduk.toString())
+                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@DetailKeranjangActivity)
+                        builder.setTitle("Hapus Keranjang")
+                        builder.setPositiveButton("Ya",
+                            DialogInterface.OnClickListener { _, _ ->
+                                deleteData(list.idProduk.toString())
+                            })
+                        builder.setNegativeButton("Batal",
+                            DialogInterface.OnClickListener { dialogInterface, _ ->
+                                dialogInterface.cancel()
+                            })
+                        builder.show()
                     }
 
                     override fun onClick(position: Int, list: CartModel) {
@@ -252,7 +283,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.txtTotalAll.text = formatter.format(all)
     }
 
-
     private fun loading(isLoading: Boolean) {
         if (isLoading) {
             progressDialog.setMessage("Tunggu sebentar...")
@@ -261,5 +291,65 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         } else {
             progressDialog.dismiss()
         }
+    }
+
+    private fun showLoadingDialog() {
+        loadingDialog = LoadingDialogSearch.create(this)
+        loadingDialog?.show()
+    }
+
+    private fun dismissLoadingDialog() {
+        loadingDialog?.dismiss()
+    }
+
+    fun distance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val theta = lon1 - lon2
+        var dist =
+            Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(
+                Math.toRadians(lat1)
+            ) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta))
+        dist = Math.acos(dist)
+        dist = Math.toDegrees(dist)
+        dist *= 60 * 1.1515 // Mengubah menjadi mil
+        dist *= 1.609344 // Mengubah menjadi kilometer
+        return dist
+    }
+
+    fun main() {
+        val firebaseDatabase = FirebaseDatabase.getInstance()
+        val driverRef = firebaseDatabase.getReference("driver_active")
+
+        // Lokasi Anda
+        val yourLatitude = -7.655570936875087
+        val yourLongitude = 112.68822961870752
+
+        // Variabel untuk menyimpan driver terdekat
+        var nearestDriverId: String? = null
+        var nearestDistance = Double.MAX_VALUE
+
+        // Filter dan ambil driver aktif dengan jarak kurang dari 3 km
+        driverRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (driverSnapshot in snapshot.children) {
+                    val latitude = driverSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
+                    val longitude = driverSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
+                    val status = driverSnapshot.child("status").getValue(String::class.java) ?: ""
+
+                    val dist = distance(yourLatitude, yourLongitude, latitude, longitude)
+                    if (status == "aktif" && dist < 3.0 && dist < nearestDistance) {
+                        nearestDriverId = driverSnapshot.key ?: ""
+                        nearestDistance = dist
+                    }
+                }
+
+                // Lakukan apa pun dengan driver terdekat (nearestDriverId)
+                info("Driver aktif terdekat: $nearestDriverId")
+                // Misalnya, menampilkan atau menyimpan hasilnya.
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error (if any)
+            }
+        })
     }
 }
