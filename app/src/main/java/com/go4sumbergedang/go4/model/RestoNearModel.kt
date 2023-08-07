@@ -2,7 +2,7 @@ package com.go4sumbergedang.go4.model
 
 import com.google.gson.annotations.SerializedName
 
-data class RestoModel(
+data class RestoNearModel(
 
     @field:SerializedName("jam_tutup")
     val jamTutup: String? = null,

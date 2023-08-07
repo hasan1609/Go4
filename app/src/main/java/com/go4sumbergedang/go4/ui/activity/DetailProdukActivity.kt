@@ -7,7 +7,7 @@ import androidx.databinding.DataBindingUtil
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.ActivityDetailProdukBinding
 import com.go4sumbergedang.go4.model.CartModel
-import com.go4sumbergedang.go4.model.TokoItemModel
+import com.go4sumbergedang.go4.model.TokoCartModel
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.google.firebase.database.*
 import org.jetbrains.anko.AnkoLogger
@@ -126,7 +126,7 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
         // Ambil data toko dari Firebase
         tokoReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                var dataToko = dataSnapshot.getValue(TokoItemModel::class.java)
+                var dataToko = dataSnapshot.getValue(TokoCartModel::class.java)
 
                 if (dataToko != null) {
                     // Jika data toko sudah ada
@@ -151,7 +151,7 @@ class DetailProdukActivity : AppCompatActivity() , AnkoLogger{
                     val cartItems = mutableMapOf<String, CartModel>()
                     cartItems[dataProduk.idProduk.toString()] = dataProduk
 
-                    dataToko = TokoItemModel(
+                    dataToko = TokoCartModel(
                         idToko = idRestoE.toString(),
                         nama_toko = namaCart,
                         foto = fotoCart,

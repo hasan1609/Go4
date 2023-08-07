@@ -9,12 +9,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.ProdukModel
-import com.go4sumbergedang.go4.model.RestoModel
+import com.go4sumbergedang.go4.model.RestoNearModel
 import com.squareup.picasso.Picasso
 
 class ProdukAdapter(
     private val dataList: List<Any>,
-    private val restoModel: RestoModel,
+    private val restoNearModel: RestoNearModel,
     private val context: Context
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -81,7 +81,7 @@ class ProdukAdapter(
             holder.bind(item)
             holder.itemView.setOnClickListener {
                 if (dialog!=null){
-                    dialog!!.onClick(position, restoModel.namaResto.toString() , restoModel.foto.toString() ,item)
+                    dialog!!.onClick(position, restoNearModel.namaResto.toString() , restoNearModel.foto.toString() ,item)
                 }
             }
         }

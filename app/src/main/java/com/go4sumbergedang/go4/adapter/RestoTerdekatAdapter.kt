@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.model.RestoModel
+import com.go4sumbergedang.go4.model.RestoNearModel
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
 class RestoTerdekatAdapter (
-    private val listData :MutableList<RestoModel>,
+    private val listData :MutableList<RestoNearModel>,
     private val context: Context
 ) : RecyclerView.Adapter<RestoTerdekatAdapter.ViewHolder>(){
 

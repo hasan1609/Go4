@@ -1,7 +1,6 @@
 package com.go4sumbergedang.go4.ui.activity
 
 import android.app.ProgressDialog
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -11,12 +10,10 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDataRestoTerdekatBinding
 import com.go4sumbergedang.go4.model.ResponseResto
-import com.go4sumbergedang.go4.model.RestoModel
+import com.go4sumbergedang.go4.model.RestoNearModel
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.go4sumbergedang.go4.webservices.ApiClient
-import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseError
-import com.google.gson.Gson
 import org.jetbrains.anko.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -73,7 +70,7 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
                 try {
                     if (response.isSuccessful) {
                         loading(false)
-                        val notesList = mutableListOf<RestoModel>()
+                        val notesList = mutableListOf<RestoNearModel>()
                         val data = response.body()
                         if (data!!.status == true) {
                             loading(false)

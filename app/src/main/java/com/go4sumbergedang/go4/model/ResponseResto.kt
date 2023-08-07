@@ -4,13 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 data class ResponseResto(
 
-	@field:SerializedName("data")
-	val data: List<RestoModel?>? = null,
+    @field:SerializedName("data")
+	val data: List<RestoNearModel?>? = null,
 
-	@field:SerializedName("message")
+    @field:SerializedName("message")
 	val message: String? = null,
 
-	@field:SerializedName("status")
+    @field:SerializedName("status")
 	val status: Boolean? = null
 )
 

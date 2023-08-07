@@ -9,24 +9,24 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.model.TokoItemModel
+import com.go4sumbergedang.go4.model.TokoCartModel
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.ref.WeakReference
 
 class TokoCartAdapter(
-    private val listData: MutableList<TokoItemModel>,
+    private val listData: MutableList<TokoCartModel>,
     private val context: Context
 ) : RecyclerView.Adapter<TokoCartAdapter.ViewHolder>(){
 
     private var dialog: Dialog? = null
     private var hapusDialog: OnDeleteClickListener? = null
     interface Dialog {
-        fun onClick(position: Int, list : TokoItemModel)
+        fun onClick(position: Int, list : TokoCartModel)
     }
 
     interface OnDeleteClickListener {
-        fun onDeleteClick(position: Int, note: TokoItemModel)
+        fun onDeleteClick(position: Int, note: TokoCartModel)
     }
 
     fun setOnDeleteClickListener(listener: OnDeleteClickListener) {

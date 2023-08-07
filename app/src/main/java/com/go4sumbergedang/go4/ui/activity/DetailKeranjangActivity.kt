@@ -14,27 +14,35 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.CartAdapter
-import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailKeranjangBinding
-import com.go4sumbergedang.go4.model.CartModel
-import com.go4sumbergedang.go4.model.TokoItemModel
+import com.go4sumbergedang.go4.model.*
 import com.go4sumbergedang.go4.utils.LoadingDialogSearch
+import com.go4sumbergedang.go4.webservices.ApiClient
+import com.go4sumbergedang.go4.webservices.ApiService
 import com.google.firebase.database.*
 import com.google.gson.Gson
+import okhttp3.ResponseBody
 import org.jetbrains.anko.*
-import org.jetbrains.anko.support.v4.startActivity
-import org.jetbrains.anko.support.v4.toast
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.text.DecimalFormat
 
 class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityDetailKeranjangBinding
-    private lateinit var detailCart: TokoItemModel
+    var api = ApiClient.instance()
+    private lateinit var detailCart: TokoCartModel
     private lateinit var cartAdapter: CartAdapter
     private lateinit var progressDialog: ProgressDialog
     private var loadingDialog: LoadingDialogSearch? = null
     private lateinit var cartListener: ValueEventListener
     private val cartItems = mutableListOf<CartModel>()
     var userId: String? = null
+    var addLat: Double? = null
+    var addLong: Double? = null
+    private var dataAddedAfterBtnBeli = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +52,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         userId = "id_user"
         val gson = Gson()
         detailCart =
-            gson.fromJson(intent.getStringExtra("detailCart"), TokoItemModel::class.java)
+            gson.fromJson(intent.getStringExtra("detailCart"), TokoCartModel::class.java)
         binding.appBar.btnToKeranjang.visibility = View.GONE
         binding.appBar.titleTextView.text = detailCart.nama_toko
         binding.appBar.backButton.setOnClickListener {
@@ -58,8 +66,17 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         getData(userId.toString(), detailCart.idToko.toString())
 
         binding.btnBeli.setOnClickListener {
-            showLoadingDialog()
-            main()
+            if (detailCart.idToko != null){
+                getDataToko(detailCart.idToko.toString())
+                showLoadingDialog()
+                addLat?.let { it1 -> addLong?.let { it2 -> cariDriver(it1, it2) } }
+
+                // Set flag to true after clicking btnBeli
+                dataAddedAfterBtnBeli = true
+            } else {
+                toast("idkosong")
+            }
+            dismissLoadingDialog()
         }
         dismissLoadingDialog()
     }
@@ -107,7 +124,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
 
     private fun setSwipe() {
         ItemTouchHelper(object : ItemTouchHelper.Callback() {
-
             private val limitScrollX = dipToPx(60f, this@DetailKeranjangActivity)
             private var currentScrollX = 0
             private var currentScrollXWhenInActive = 0
@@ -122,7 +138,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 val swipeFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
                 return makeMovementFlags(dragFlags, swipeFlags)
             }
-
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -130,19 +145,15 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
             ): Boolean {
                 return true
             }
-
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 TODO("Not yet implemented")
             }
-
             override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
                 return Int.MAX_VALUE.toFloat()
             }
-
             override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
                 return Int.MAX_VALUE.toFloat()
             }
-
             override fun onChildDraw(
                 c: Canvas,
                 recyclerView: RecyclerView,
@@ -216,12 +227,14 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         cartListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 loading(false)
-                cartItems.clear()
-                for (cartItemSnapshot in dataSnapshot.children) {
-                    val cartItem = cartItemSnapshot.getValue(CartModel::class.java)
-                    if (cartItem != null) {
-                        // Tambahkan data toko ke list
-                        cartItems.add(cartItem)
+                if (!dataAddedAfterBtnBeli) {
+                    cartItems.clear()
+                    for (cartItemSnapshot in dataSnapshot.children) {
+                        val cartItem = cartItemSnapshot.getValue(CartModel::class.java)
+                        if (cartItem != null) {
+                            // Tambahkan data toko ke list
+                            cartItems.add(cartItem)
+                        }
                     }
                 }
                 cartAdapter = CartAdapter(cartItems, this@DetailKeranjangActivity)
@@ -302,7 +315,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         loadingDialog?.dismiss()
     }
 
-    fun distance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    private fun distance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val theta = lon1 - lon2
         var dist =
             Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(
@@ -315,16 +328,13 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         return dist
     }
 
-    fun main() {
+    private fun cariDriver(lat: Double, long: Double) {
         val firebaseDatabase = FirebaseDatabase.getInstance()
         val driverRef = firebaseDatabase.getReference("driver_active")
 
-        // Lokasi Anda
-        val yourLatitude = -7.655570936875087
-        val yourLongitude = 112.68822961870752
-
         // Variabel untuk menyimpan driver terdekat
         var nearestDriverId: String? = null
+        var fcmDriverId: String? = null
         var nearestDistance = Double.MAX_VALUE
 
         // Filter dan ambil driver aktif dengan jarak kurang dari 3 km
@@ -334,21 +344,122 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                     val latitude = driverSnapshot.child("latitude").getValue(Double::class.java) ?: 0.0
                     val longitude = driverSnapshot.child("longitude").getValue(Double::class.java) ?: 0.0
                     val status = driverSnapshot.child("status").getValue(String::class.java) ?: ""
+                    val fcm = driverSnapshot.child("kodeFcm").getValue(String::class.java) ?: ""
 
-                    val dist = distance(yourLatitude, yourLongitude, latitude, longitude)
-                    if (status == "aktif" && dist < 3.0 && dist < nearestDistance) {
+                    val dist = distance(lat, long, latitude, longitude)
+                    if (status == "active" && dist < 3.0 && dist < nearestDistance) {
                         nearestDriverId = driverSnapshot.key ?: ""
+                        fcmDriverId = fcm
                         nearestDistance = dist
                     }
                 }
 
                 // Lakukan apa pun dengan driver terdekat (nearestDriverId)
-                info("Driver aktif terdekat: $nearestDriverId")
+                toast("Driver aktif terdekat: $nearestDriverId")
                 // Misalnya, menampilkan atau menyimpan hasilnya.
+                if (!nearestDriverId.isNullOrEmpty()) {
+                    kirimNotifikasiFCM(fcmDriverId.toString())
+                    simpanDataKeDatabase(cartItems, nearestDriverId!!)
+                }else{
+                    simpanDataKeDatabase(cartItems, nearestDriverId!!)
+                }
+                dismissLoadingDialog()
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle error (if any)
+                dismissLoadingDialog()
+            }
+        })
+    }
+
+    private fun simpanDataKeDatabase(cartItems: List<CartModel>, driverId: String) {
+        // Ambil referensi database yang sesuai
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        val userId = "id_user" // Ganti dengan id user sesuai kebutuhan
+
+        // Buat node baru di database dengan nama "pesanan" atau yang sesuai kebutuhan Anda
+        val pesananRef = databaseReference.child("booking").push()
+
+        // Buat objek untuk menyimpan data pesanan
+        val cartItemsMap = hashMapOf<String, Any>()
+        for ((index, cartItem) in cartItems.withIndex()) {
+            cartItemsMap[cartItem.idProduk.toString()] = cartItem
+        }
+
+        val pesananData = hashMapOf(
+            "userId" to userId,
+            "driverId" to driverId,
+            "tanggalPesan" to ServerValue.TIMESTAMP,
+            "totalHarga" to cartAdapter.getTotalJumlah(),
+            "status" to "Sedang Proses",
+            "pesanan" to cartItemsMap
+        )
+
+        // Simpan data pesanan ke dalam database
+        pesananRef.setValue(pesananData)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Berhasil menyimpan data
+                    toast("Pesanan berhasil disimpan")
+                } else {
+                    // Gagal menyimpan data
+                    toast("Gagal menyimpan pesanan")
+                }
+            }
+    }
+
+    private fun kirimNotifikasiFCM(fcmdriverId: String) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://fcm.googleapis.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val apiService = retrofit.create(ApiService::class.java)
+        val notification = Notification("Test Notification", "This is a test notification from Retrofit")
+        val notificationData = NotificationData(fcmdriverId, notification)
+
+        apiService.sendNotification(notificationData).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    // Notifikasi berhasil dikirim
+                    toast("Notifikasi terkirim ke driver")
+                } else {
+                    // Gagal mengirim notifikasi
+                    toast("Gagal Mengirim Notifikasi")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                // Tangani kesalahan koneksi atau permintaan
+                toast("Gagal mengirim notifikasi ke driver")
+            }
+        })
+    }
+
+    private fun getDataToko(id_Toko: String){
+        api.getRestoById(id_Toko).enqueue(object : Callback<ResponseRestoSingle> {
+            override fun onResponse(
+                call: Call<ResponseRestoSingle>,
+                response: Response<ResponseRestoSingle>
+            ) {
+                try {
+                    if (response.isSuccessful) {
+                        val data = response.body()
+                        if (data!!.status == true) {
+                            addLat = data.data!!.detailResto!!.latitude!!.toDouble()
+                            addLong = data.data.detailResto!!.longitude!!.toDouble()
+                        }
+                    } else {
+                        toast("gagal mendapatkan response")
+                    }
+                } catch (e: Exception) {
+                    info { "hasannne ${e.message}" }
+                    toast(e.message.toString())
+                }
+            }
+            override fun onFailure(call: Call<ResponseRestoSingle>, t: Throwable) {
+                info { "hasan ${t.message}" }
+                toast(t.message.toString())
             }
         })
     }

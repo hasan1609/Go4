@@ -25,7 +25,7 @@ import retrofit2.Response
 
 class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
     private lateinit var binding: ActivityDetailRestoBinding
-    lateinit var tokoItemModel: TokoItemModel
+    lateinit var tokoItemModel: TokoCartModel
     lateinit var mAdapter: ProdukAdapter
     private lateinit var progressDialog: ProgressDialog
     var api = ApiClient.instance()

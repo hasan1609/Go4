@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityKeranjangBinding
-import com.go4sumbergedang.go4.model.TokoItemModel
+import com.go4sumbergedang.go4.model.TokoCartModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -28,7 +28,7 @@ import org.jetbrains.anko.toast
 class KeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityKeranjangBinding
     private lateinit var cartAdapter: TokoCartAdapter
-    private val cartList: MutableList<TokoItemModel> = mutableListOf()
+    private val cartList: MutableList<TokoCartModel> = mutableListOf()
     private lateinit var progressDialog: ProgressDialog
     private lateinit var cartListener: ValueEventListener
     var userId: String? = null
@@ -62,7 +62,7 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                 loading(false)
                 cartList.clear()
                 for (tokoSnapshot in dataSnapshot.children) {
-                    val tokoCart = tokoSnapshot.getValue(TokoItemModel::class.java)
+                    val tokoCart = tokoSnapshot.getValue(TokoCartModel::class.java)
                     if (tokoCart != null) {
                         // Tambahkan data toko ke list
                         cartList.add(tokoCart)
@@ -79,14 +79,14 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                     // Update adapter
                     cartAdapter.notifyDataSetChanged()
                     cartAdapter.setDialog(object : TokoCartAdapter.Dialog {
-                        override fun onClick(position: Int, list: TokoItemModel) {
+                        override fun onClick(position: Int, list: TokoCartModel) {
                             val gson = Gson()
                             val noteJson = gson.toJson(list)
                             startActivity<DetailKeranjangActivity>("detailCart" to noteJson)
                         }
                     })
                     cartAdapter.setOnDeleteClickListener(object : TokoCartAdapter.OnDeleteClickListener {
-                        override fun onDeleteClick(position: Int, note: TokoItemModel) {
+                        override fun onDeleteClick(position: Int, note: TokoCartModel) {
                             val builder: AlertDialog.Builder = AlertDialog.Builder(this@KeranjangActivity)
                             builder.setTitle("Hapus Keranjang")
                             builder.setPositiveButton("Ya",
