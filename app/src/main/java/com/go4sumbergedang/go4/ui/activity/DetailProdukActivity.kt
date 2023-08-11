@@ -15,6 +15,7 @@ import com.go4sumbergedang.go4.utils.CartItemCountEvent
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.gson.Gson
+import com.squareup.picasso.Picasso
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -48,7 +49,18 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.btnToKeranjang.setOnClickListener {
             startActivity<KeranjangActivity>()
         }
-
+        val urlImage = this.getString(R.string.urlImage)
+        val foto = produk.fotoProduk.toString()
+        var def = "/public/images/no_image.png"
+        if (produk.fotoProduk != null){
+            Picasso.get()
+                .load(urlImage+foto)
+                .into(binding.fotoProduk)
+        }else{
+            Picasso.get()
+                .load(urlImage+def)
+                .into(binding.fotoProduk)
+        }
         binding.txtNamaProduk.text = produk.namaProduk
         binding.txtHargaProduk.text = produk.harga
         if (produk.keterangan != null) {

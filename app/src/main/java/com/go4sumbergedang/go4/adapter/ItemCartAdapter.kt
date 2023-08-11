@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.ItemCartModel
+import com.go4sumbergedang.go4.model.ProdukModel
 import com.squareup.picasso.Picasso
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
@@ -23,7 +24,7 @@ class ItemCartAdapter (
 
     interface Dialog {
         fun onDelete(position: Int, list: ItemCartModel)
-        fun onClick(position: Int, list: ItemCartModel)
+        fun onClick(position: Int, list: ProdukModel)
     }
 
     fun setClick(dialog: Dialog) {
@@ -113,7 +114,7 @@ class ItemCartAdapter (
 
         holder.itemView.setOnClickListener {
             if (dialog != null) {
-                dialog!!.onClick(position, cartModel)
+                dialog!!.onClick(position, cartModel.produk)
             }
         }
     }

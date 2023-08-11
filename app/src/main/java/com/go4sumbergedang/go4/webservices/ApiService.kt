@@ -54,11 +54,22 @@ interface ApiService {
         @Path("lat") lat: String,
         @Path("long") long: String,
     ): Call<ResponseCart>
-
+//    get item cart
     @GET("cart/item/{id}/{user}")
     fun getItemCart(
         @Path("id") id: String,
         @Path("user") user: String,
     ): Call<ResponseItemCart>
+//    hapus cart by id resto
+    @POST("cart/{id}/{user}")
+    fun hapusCart(
+        @Path("id") id: String,
+        @Path("user") user: String
+    ): Call<ResponsePostData>
+//    hapus cart by id cart
+    @POST("item/cart/{id}")
+    fun hapusByIdCart(
+        @Path("id") id: String
+    ): Call<ResponsePostData>
 
 }

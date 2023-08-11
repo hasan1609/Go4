@@ -19,6 +19,7 @@ class TokoCartAdapter(
 
     private var dialog: Dialog? = null
     private var hapusDialog: OnDeleteClickListener? = null
+
     interface Dialog {
         fun onClick(position: Int, list : RestoCartModel)
     }

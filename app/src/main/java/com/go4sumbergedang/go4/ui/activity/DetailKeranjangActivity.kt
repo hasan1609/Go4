@@ -59,15 +59,11 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 .putExtra("detailToko", detailCart.tokoId)
             startActivity(intent)
         }
-        getData("f3ece8ed-6353-4268-bdce-06ba4c6049fe", detailCart.tokoId.toString())
 
         binding.btnBeli.setOnClickListener {
             dismissLoadingDialog()
         }
         dismissLoadingDialog()
-    }
-
-    private fun deleteData(idProduk: String) {
     }
 
     private fun setSwipe() {
@@ -175,6 +171,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
             ) {
                 try {
                     if (response.isSuccessful) {
+                        cartItems.clear()
                         loading(false)
                         val data = response.body()
                         val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
@@ -185,9 +182,72 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                         for (hasil in data.data!!) {
                             cartItems.add(hasil!!)
                             itemcartAdapter = ItemCartAdapter(cartItems, this@DetailKeranjangActivity)
+                            itemcartAdapter.setClick(object :
+                                ItemCartAdapter.Dialog {
+                                override fun onDelete(position: Int, list: ItemCartModel) {
+                                    val builder: AlertDialog.Builder =
+                                        AlertDialog.Builder(this@DetailKeranjangActivity)
+                                    builder.setTitle("Hapus Item")
+                                    builder.setPositiveButton("Ya",
+                                        DialogInterface.OnClickListener { _, _ ->
+                                            api.hapusByIdCart(list.idCart.toString()).enqueue(object :
+                                                Callback<ResponsePostData> {
+                                                override fun onResponse(
+                                                    call: Call<ResponsePostData>,
+                                                    response: Response<ResponsePostData>
+                                                ) {
+                                                    try {
+                                                        if (response.body()!!.status == true) {
+                                                            cartItems.removeAt(position) // Hapus dari dataset di adapter
+                                                            itemcartAdapter.notifyItemRemoved(position)
+                                                            itemcartAdapter.notifyDataSetChanged()
+                                                            binding.rvCart.requestLayout();
+                                                            // Hitung ulang total jumlah produk
+                                                            val newTotal = calculateTotal(cartItems)
+
+                                                            // Update nilai subtotal
+                                                            val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
+                                                            val symbols = formatter.decimalFormatSymbols
+                                                            symbols.currencySymbol = "Rp. "
+                                                            formatter.decimalFormatSymbols = symbols
+                                                            binding.txtSubTotalProduk.text = formatter.format(newTotal)
+                                                            if (cartItems.size < 1) {
+                                                                finish() // Jika sisa item hanya 1, selesaikan Activity
+                                                            }
+                                                            toast("Berhasil mengapus")
+                                                        } else {
+                                                            toast("Gagal mengapus")
+                                                        }
+                                                    } catch (e: Exception) {
+                                                        toast("Kesalahan jaringan")
+                                                        info { "hasan ${e.message}${response.code()} " }
+                                                    }
+                                                }
+                                                override fun onFailure(
+                                                    call: Call<ResponsePostData>,
+                                                    t: Throwable
+                                                ) {
+                                                    toast("Respon server gagal")
+                                                }
+                                            })
+                                        })
+                                    builder.setNegativeButton("Batal",
+                                        DialogInterface.OnClickListener { dialogInterface, _ ->
+                                            dialogInterface.cancel()
+                                        })
+                                    builder.show()
+                                }
+
+                                override fun onClick(position: Int, list: ProdukModel) {
+                                    val gson = Gson()
+                                    val noteJson = gson.toJson(list)
+                                    startActivity<DetailProdukActivity>("detailProduk" to noteJson)
+                                }
+                            })
                             binding.rvCart.adapter = itemcartAdapter
                             itemcartAdapter.notifyDataSetChanged()
                             setSwipe()
+
                         }
 
                     } else {
@@ -207,6 +267,14 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
             }
         })
 
+    }
+
+    private fun calculateTotal(cartItems: MutableList<ItemCartModel>): Double {
+        var total = 0.0
+        for (item in cartItems) {
+            total += item.total!!.toDoubleOrNull()!!
+        }
+        return total
     }
 
     private fun loading(isLoading: Boolean) {
@@ -315,5 +383,10 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 toast("Gagal mengirim notifikasi ke driver")
             }
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        getData("f3ece8ed-6353-4268-bdce-06ba4c6049fe", detailCart.tokoId.toString())
     }
 }

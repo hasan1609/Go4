@@ -16,10 +16,7 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityKeranjangBinding
-import com.go4sumbergedang.go4.model.ResponseCart
-import com.go4sumbergedang.go4.model.ResponseResto
-import com.go4sumbergedang.go4.model.RestoCartModel
-import com.go4sumbergedang.go4.model.RestoNearModel
+import com.go4sumbergedang.go4.model.*
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
@@ -47,8 +44,6 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
-        userId = "f3ece8ed-6353-4268-bdce-06ba4c6049fe"
-        getData(userId.toString(), "-7.650450494080474", "112.68361967677231")
     }
 
     fun getData(id: String, latitude: String, longitude: String) {
@@ -74,11 +69,11 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                         } else {
                             binding.txtKosong.visibility = View.GONE
                             binding.rvProduk.visibility = View.VISIBLE
+                            cartList.clear()
                             for (hasil in data.data!!) {
                                 cartList.add(hasil!!)
                                 cartAdapter = TokoCartAdapter(cartList, this@KeranjangActivity)
                                 binding.rvProduk.adapter = cartAdapter
-                                cartAdapter.notifyDataSetChanged()
                                 cartAdapter.setDialog(object : TokoCartAdapter.Dialog {
                                     override fun onClick(position: Int, list: RestoCartModel) {
                                         val gson = Gson()
@@ -97,7 +92,38 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                                         builder.setTitle("Hapus Keranjang")
                                         builder.setPositiveButton("Ya",
                                             DialogInterface.OnClickListener { _, _ ->
-                                                deleteData(note.tokoId.toString())
+                                                api.hapusCart(note.tokoId.toString(), note.userId.toString()).enqueue(object :
+                                                    Callback<ResponsePostData> {
+                                                    override fun onResponse(
+                                                        call: Call<ResponsePostData>,
+                                                        response: Response<ResponsePostData>
+                                                    ) {
+                                                        try {
+                                                            if (response.body()!!.status == true) {
+                                                                cartList.removeAt(position) // Hapus dari dataset di adapter
+                                                                cartAdapter.notifyItemRemoved(position)
+                                                                cartAdapter.notifyDataSetChanged()
+                                                                binding.rvProduk.requestLayout();
+                                                                if (cartList.size < 1) {
+                                                                    binding.txtKosong.visibility = View.VISIBLE
+                                                                    binding.rvProduk.visibility = View.GONE // Jika sisa item hanya 1, selesaikan Activity
+                                                                }
+                                                                toast("Berhasil mengapus")
+                                                            } else {
+                                                                toast("Gagal mengapus")
+                                                            }
+                                                        } catch (e: Exception) {
+                                                            toast("Kesalahan jaringan")
+                                                            info { "hasan ${e.message}${response.code()} " }
+                                                        }
+                                                    }
+                                                    override fun onFailure(
+                                                        call: Call<ResponsePostData>,
+                                                        t: Throwable
+                                                    ) {
+                                                        toast("Respon server gagal")
+                                                    }
+                                                })
                                             })
                                         builder.setNegativeButton("Batal",
                                             DialogInterface.OnClickListener { dialogInterface, _ ->
@@ -107,6 +133,7 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                                     }
                                 })
                                 setSwipe()
+                                cartAdapter.notifyDataSetChanged()
                             }
                         }
                     } else {
@@ -125,21 +152,6 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                 toast(t.message.toString())
             }
         })
-    }
-
-    fun deleteData(idToko: String) {
-        FirebaseDatabase.getInstance().reference
-            .child("cart")
-            .child(userId.toString())
-            .child(idToko)
-            .removeValue()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    toast("Berhasil dihapus")
-                } else {
-                    toast("Gagal dihapus")
-                }
-            }
     }
 
     private fun setSwipe() {
@@ -251,7 +263,8 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-
+        userId = "f3ece8ed-6353-4268-bdce-06ba4c6049fe"
+        getData(userId.toString(), "-7.650450494080474", "112.68361967677231")
     }
 
     override fun onPause() {
