@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Canvas
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -61,9 +62,18 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         }
 
         binding.btnBeli.setOnClickListener {
+            if (cartItems.isNotEmpty()) {
+                val allItemsInfo = StringBuilder()
+                for (item in cartItems) {
+                    // Lakukan apa pun yang diperlukan dengan data item
+                    allItemsInfo.append(item.idCart).append(",")
+                }
+                info("Semua item dalam RecyclerView:\n$allItemsInfo")
+            } else {
+                info("Tidak ada item dalam RecyclerView")
+            }
             dismissLoadingDialog()
         }
-        dismissLoadingDialog()
     }
 
     private fun setSwipe() {
@@ -182,8 +192,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                         for (hasil in data.data!!) {
                             cartItems.add(hasil!!)
                             itemcartAdapter = ItemCartAdapter(cartItems, this@DetailKeranjangActivity)
-                            itemcartAdapter.setClick(object :
-                                ItemCartAdapter.Dialog {
+                            itemcartAdapter.setClick(object : ItemCartAdapter.Dialog {
                                 override fun onDelete(position: Int, list: ItemCartModel) {
                                     val builder: AlertDialog.Builder =
                                         AlertDialog.Builder(this@DetailKeranjangActivity)
@@ -237,17 +246,19 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                                         })
                                     builder.show()
                                 }
-
-                                override fun onClick(position: Int, list: ProdukModel) {
+                                override fun onClick(position: Int, list: ItemCartModel) {
                                     val gson = Gson()
-                                    val noteJson = gson.toJson(list)
-                                    startActivity<DetailProdukActivity>("detailProduk" to noteJson)
+                                    val noteJson = gson.toJson(list.produk)
+                                    val intent = Intent(this@DetailKeranjangActivity, DetailProdukActivity::class.java)
+                                    intent.putExtra("detailProduk", noteJson)
+                                    intent.putExtra("jumlah", list.jumlah)
+                                    intent.putExtra("catatan", list.catatan.toString())
+                                    startActivity(intent)
                                 }
                             })
                             binding.rvCart.adapter = itemcartAdapter
                             itemcartAdapter.notifyDataSetChanged()
                             setSwipe()
-
                         }
 
                     } else {

@@ -20,6 +20,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 import retrofit2.Call
@@ -31,7 +32,7 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
     var api = ApiClient.instance()
     private lateinit var progressDialog: ProgressDialog
     lateinit var produk: ProdukModel
-    private var clickCounter = 1
+    private var clickCounter: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,8 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
         val gson = Gson()
         produk =
             gson.fromJson(intent.getStringExtra("detailProduk"), ProdukModel::class.java)
+        val jumlahIntent = intent.getStringExtra("jumlah")
+        val catatanIntent = intent.getStringExtra("catatan")
 
         binding.appBar.titleTextView.text = "Detail Produk"
         binding.appBar.backButton.setOnClickListener {
@@ -70,7 +73,18 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
             binding.txtKetProduk.visibility = View.GONE
         }
 
-        binding.edtJumlah.setText("1")
+        if (catatanIntent != "null"){
+            binding.edtCatatan.setText(catatanIntent)
+        }else{
+            binding.edtCatatan.setText("")
+        }
+        if (jumlahIntent != null ){
+            binding.edtJumlah.setText(jumlahIntent)
+            clickCounter = jumlahIntent.toInt()
+        }else{
+            binding.edtJumlah.setText("1")
+        }
+
         binding.icPlus.setOnClickListener {
             clickCounter++
             binding.edtJumlah.setText(clickCounter.toString())
@@ -120,6 +134,7 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
                 } else {
                     loading(false)
                     toast("Gagal menambahkan produk")
+                    info(response.body())
                 }
             }
 

@@ -24,7 +24,7 @@ class ItemCartAdapter (
 
     interface Dialog {
         fun onDelete(position: Int, list: ItemCartModel)
-        fun onClick(position: Int, list: ProdukModel)
+        fun onClick(position: Int, list: ItemCartModel)
     }
 
     fun setClick(dialog: Dialog) {
@@ -90,7 +90,6 @@ class ItemCartAdapter (
         holder.harga.text = "$hargas x $jml"
         holder.total.text = totals
 
-
         if (cartModel.catatan == null) {
             holder.keterangan.visibility = View.GONE
         } else {
@@ -114,7 +113,7 @@ class ItemCartAdapter (
 
         holder.itemView.setOnClickListener {
             if (dialog != null) {
-                dialog!!.onClick(position, cartModel.produk)
+                dialog!!.onClick(position, cartModel)
             }
         }
     }
