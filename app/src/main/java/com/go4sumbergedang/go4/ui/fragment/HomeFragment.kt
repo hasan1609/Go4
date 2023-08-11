@@ -10,8 +10,12 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.FragmentHomeBinding
 import com.go4sumbergedang.go4.ui.activity.DataRestoTerdekatActivity
 import com.go4sumbergedang.go4.ui.activity.KeranjangActivity
+import com.go4sumbergedang.go4.utils.CartItemCountEvent
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.google.firebase.database.DatabaseError
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.support.v4.startActivity
 
@@ -25,6 +29,8 @@ class HomeFragment : Fragment(), AnkoLogger {
     ): View? {
         binding = DataBindingUtil.inflate(inflater ,R.layout.fragment_home, container, false)
         binding.lifecycleOwner = this
+        EventBus.getDefault().register(this)
+        CartUtils.getCartItemCount("f3ece8ed-6353-4268-bdce-06ba4c6049fe")
 
         binding.cardMakanan.setOnClickListener {
             startActivity<DataRestoTerdekatActivity>()
@@ -33,24 +39,25 @@ class HomeFragment : Fragment(), AnkoLogger {
         binding.btnToKeranjang.setOnClickListener{
             startActivity<KeranjangActivity>()
         }
+
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        val countDataListener = object : CartUtils.CountDataListener {
-            override fun onCountUpdated(count: Long) {
-                if (count > 0){
-                    binding.divBadge.visibility = View.VISIBLE
-                }else{
-                    binding.divBadge.visibility = View.GONE
-                }
-            }
-
-            override fun onError(error: DatabaseError) {
-                // Tangani kesalahan jika terjadi
-            }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onCartItemCountEvent(event: CartItemCountEvent) {
+        val cartItemCount = event.itemCount
+        // Update tampilan jumlah item keranjang di aktivitas ini
+        if (cartItemCount != 0) {
+            binding.divBadge.visibility = View.VISIBLE
+        } else {
+            binding.divBadge.visibility = View.GONE
         }
-        CartUtils.startCountDataListener("id_user", countDataListener)
+    }
+
+    // ...
+
+    override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this) // Batalkan pendaftaran saat aktivitas dihancurkan
     }
 }

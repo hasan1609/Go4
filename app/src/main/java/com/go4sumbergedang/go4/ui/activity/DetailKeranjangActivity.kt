@@ -13,7 +13,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.adapter.CartAdapter
+import com.go4sumbergedang.go4.adapter.ItemCartAdapter
+import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailKeranjangBinding
 import com.go4sumbergedang.go4.model.*
 import com.go4sumbergedang.go4.utils.LoadingDialogSearch
@@ -33,15 +34,11 @@ import java.text.DecimalFormat
 class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityDetailKeranjangBinding
     var api = ApiClient.instance()
-    private lateinit var detailCart: TokoCartModel
-    private lateinit var cartAdapter: CartAdapter
+    private lateinit var detailCart: RestoCartModel
+    private lateinit var itemcartAdapter: ItemCartAdapter
     private lateinit var progressDialog: ProgressDialog
     private var loadingDialog: LoadingDialogSearch? = null
-    private lateinit var cartListener: ValueEventListener
-    private val cartItems = mutableListOf<CartModel>()
-    var userId: String? = null
-    var addLat: Double? = null
-    var addLong: Double? = null
+    private val cartItems = mutableListOf<ItemCartModel>()
     private var dataAddedAfterBtnBeli = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,77 +46,28 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_keranjang)
         binding.lifecycleOwner = this
         progressDialog = ProgressDialog(this)
-        userId = "id_user"
         val gson = Gson()
         detailCart =
-            gson.fromJson(intent.getStringExtra("detailCart"), TokoCartModel::class.java)
+            gson.fromJson(intent.getStringExtra("detailCart"), RestoCartModel::class.java)
         binding.appBar.btnToKeranjang.visibility = View.GONE
-        binding.appBar.titleTextView.text = detailCart.nama_toko
+        binding.appBar.titleTextView.text = detailCart.resto!!.namaResto
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
         binding.txtTambah.setOnClickListener {
             val intent = intentFor<DetailRestoActivity>()
-                .putExtra("detailToko", detailCart.idToko.toString())
+                .putExtra("detailToko", detailCart.tokoId)
             startActivity(intent)
         }
-        getData(userId.toString(), detailCart.idToko.toString())
+        getData("f3ece8ed-6353-4268-bdce-06ba4c6049fe", detailCart.tokoId.toString())
 
         binding.btnBeli.setOnClickListener {
-            if (detailCart.idToko != null){
-                getDataToko(detailCart.idToko.toString())
-                showLoadingDialog()
-                addLat?.let { it1 -> addLong?.let { it2 -> cariDriver(it1, it2) } }
-
-                // Set flag to true after clicking btnBeli
-                dataAddedAfterBtnBeli = true
-            } else {
-                toast("idkosong")
-            }
             dismissLoadingDialog()
         }
         dismissLoadingDialog()
     }
 
     private fun deleteData(idProduk: String) {
-        val cartReference = FirebaseDatabase.getInstance().reference
-            .child("cart")
-            .child(userId.toString())
-            .child(detailCart.idToko.toString())
-
-        cartReference.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val cartItemsCount = dataSnapshot.child("cartItems").childrenCount.toInt()
-                if (cartItemsCount == 1) {
-                    // Hapus data cartItems dan id_toko
-                    cartReference.removeValue()
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                toast("Berhasil dihapus")
-                                finish()
-                            } else {
-                                toast("Gagal dihapus")
-                            }
-                        }
-                } else {
-                    // Hapus data cartItems saja
-                    cartReference.child("cartItems")
-                        .child(idProduk)
-                        .removeValue()
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                toast("Berhasil dihapus")
-                            } else {
-                                toast("Gagal dihapus")
-                            }
-                        }
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                toast("Gagal mendapatkan data")
-            }
-        })
     }
 
     private fun setSwipe() {
@@ -220,80 +168,45 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         (binding.rvCart.layoutManager as LinearLayoutManager).orientation =
             LinearLayoutManager.VERTICAL
 
-        val cartReference = FirebaseDatabase.getInstance().reference
-            .child("cart")
-            .child(idUser).child(idToko).child("cartItems")
-
-        cartListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                loading(false)
-                if (!dataAddedAfterBtnBeli) {
-                    cartItems.clear()
-                    for (cartItemSnapshot in dataSnapshot.children) {
-                        val cartItem = cartItemSnapshot.getValue(CartModel::class.java)
-                        if (cartItem != null) {
-                            // Tambahkan data toko ke list
-                            cartItems.add(cartItem)
+        api.getItemCart(idToko, idUser).enqueue(object : Callback<ResponseItemCart>{
+            override fun onResponse(
+                call: Call<ResponseItemCart>,
+                response: Response<ResponseItemCart>
+            ) {
+                try {
+                    if (response.isSuccessful) {
+                        loading(false)
+                        val data = response.body()
+                        val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
+                        val symbols = formatter.decimalFormatSymbols
+                        symbols.currencySymbol = "Rp. "
+                        formatter.decimalFormatSymbols = symbols
+                        binding.txtSubTotalProduk.text = formatter.format(data!!.totalJumlah)
+                        for (hasil in data.data!!) {
+                            cartItems.add(hasil!!)
+                            itemcartAdapter = ItemCartAdapter(cartItems, this@DetailKeranjangActivity)
+                            binding.rvCart.adapter = itemcartAdapter
+                            itemcartAdapter.notifyDataSetChanged()
+                            setSwipe()
                         }
+
+                    } else {
+                        loading(false)
+                        toast("gagal mendapatkan response")
                     }
+                } catch (e: Exception) {
+                    loading(false)
+                    info { "hasan ${e.message}" }
+                    toast(e.message.toString())
                 }
-                cartAdapter = CartAdapter(cartItems, this@DetailKeranjangActivity)
-                binding.rvCart.adapter = cartAdapter
-                setSwipe()
-
-                cartAdapter.setClick(object : CartAdapter.Dialog {
-                    override fun onDelete(position: Int, list: CartModel) {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this@DetailKeranjangActivity)
-                        builder.setTitle("Hapus Keranjang")
-                        builder.setPositiveButton("Ya",
-                            DialogInterface.OnClickListener { _, _ ->
-                                deleteData(list.idProduk.toString())
-                            })
-                        builder.setNegativeButton("Batal",
-                            DialogInterface.OnClickListener { dialogInterface, _ ->
-                                dialogInterface.cancel()
-                            })
-                        builder.show()
-                    }
-
-                    override fun onClick(position: Int, list: CartModel) {
-                        val intent = intentFor<DetailProdukActivity>()
-                            .putExtra("idProduk", list.idProduk)
-                            .putExtra("namaProduk", list.namaProduk)
-                            .putExtra("hargaProduk", list.harga)
-                            .putExtra("fotoProduk", list.fotoProduk)
-                            .putExtra("keteranganProduk", list.keterangan)
-                            .putExtra("kategoriProduk", list.kategori)
-                            .putExtra("idResto", detailCart.idToko)
-                            .putExtra("catatan", list.catatan)
-                            .putExtra("namaToko", detailCart.nama_toko)
-                            .putExtra("foto", detailCart.foto)
-                            .putExtra("keterangan", list.keterangan)
-                            .putExtra("jumlahProduk", list.jumlah.toString())
-                        startActivity(intent)
-                    }
-                })
-                updateCartItems()
             }
-            override fun onCancelled(databaseError: DatabaseError) {
+            override fun onFailure(call: Call<ResponseItemCart>, t: Throwable) {
                 loading(false)
-                toast("Gagal mendapatkan data")
+                info { "hasan ${t.message}" }
+                toast(t.message.toString())
             }
-        }
-        cartReference.addValueEventListener(cartListener)
-    }
+        })
 
-    private fun updateCartItems() {
-        cartAdapter.notifyDataSetChanged()
-        val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
-        val symbols = formatter.decimalFormatSymbols
-        symbols.currencySymbol = "Rp. "
-        formatter.decimalFormatSymbols = symbols
-        val totals = formatter.format(cartAdapter.getTotalJumlah())
-        binding.txtSubTotalProduk.text = totals
-        val ongkos = 10000
-        val all = cartAdapter.getTotalJumlah() + ongkos
-        binding.txtTotalAll.text = formatter.format(all)
     }
 
     private fun loading(isLoading: Boolean) {
@@ -359,9 +272,9 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 // Misalnya, menampilkan atau menyimpan hasilnya.
                 if (!nearestDriverId.isNullOrEmpty()) {
                     kirimNotifikasiFCM(fcmDriverId.toString())
-                    simpanDataKeDatabase(cartItems, nearestDriverId!!)
+                    simpanDataKeDatabase()
                 }else{
-                    simpanDataKeDatabase(cartItems, nearestDriverId!!)
+                    simpanDataKeDatabase()
                 }
                 dismissLoadingDialog()
             }
@@ -372,40 +285,8 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         })
     }
 
-    private fun simpanDataKeDatabase(cartItems: List<CartModel>, driverId: String) {
-        // Ambil referensi database yang sesuai
-        val databaseReference = FirebaseDatabase.getInstance().reference
-        val userId = "id_user" // Ganti dengan id user sesuai kebutuhan
-
-        // Buat node baru di database dengan nama "pesanan" atau yang sesuai kebutuhan Anda
-        val pesananRef = databaseReference.child("booking").push()
-
-        // Buat objek untuk menyimpan data pesanan
-        val cartItemsMap = hashMapOf<String, Any>()
-        for ((index, cartItem) in cartItems.withIndex()) {
-            cartItemsMap[cartItem.idProduk.toString()] = cartItem
-        }
-
-        val pesananData = hashMapOf(
-            "userId" to userId,
-            "driverId" to driverId,
-            "tanggalPesan" to ServerValue.TIMESTAMP,
-            "totalHarga" to cartAdapter.getTotalJumlah(),
-            "status" to "Sedang Proses",
-            "pesanan" to cartItemsMap
-        )
-
-        // Simpan data pesanan ke dalam database
-        pesananRef.setValue(pesananData)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Berhasil menyimpan data
-                    toast("Pesanan berhasil disimpan")
-                } else {
-                    // Gagal menyimpan data
-                    toast("Gagal menyimpan pesanan")
-                }
-            }
+    private fun simpanDataKeDatabase() {
+        TODO("Not yet implemented")
     }
 
     private fun kirimNotifikasiFCM(fcmdriverId: String) {
@@ -432,34 +313,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 // Tangani kesalahan koneksi atau permintaan
                 toast("Gagal mengirim notifikasi ke driver")
-            }
-        })
-    }
-
-    private fun getDataToko(id_Toko: String){
-        api.getRestoById(id_Toko).enqueue(object : Callback<ResponseRestoSingle> {
-            override fun onResponse(
-                call: Call<ResponseRestoSingle>,
-                response: Response<ResponseRestoSingle>
-            ) {
-                try {
-                    if (response.isSuccessful) {
-                        val data = response.body()
-                        if (data!!.status == true) {
-                            addLat = data.data!!.detailResto!!.latitude!!.toDouble()
-                            addLong = data.data.detailResto!!.longitude!!.toDouble()
-                        }
-                    } else {
-                        toast("gagal mendapatkan response")
-                    }
-                } catch (e: Exception) {
-                    info { "hasannne ${e.message}" }
-                    toast(e.message.toString())
-                }
-            }
-            override fun onFailure(call: Call<ResponseRestoSingle>, t: Throwable) {
-                info { "hasan ${t.message}" }
-                toast(t.message.toString())
             }
         })
     }

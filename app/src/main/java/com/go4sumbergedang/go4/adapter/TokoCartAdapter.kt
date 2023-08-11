@@ -5,28 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.model.TokoCartModel
+import com.go4sumbergedang.go4.model.RestoCartModel
 import com.squareup.picasso.Picasso
-import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.ref.WeakReference
 
 class TokoCartAdapter(
-    private val listData: MutableList<TokoCartModel>,
+    private val listData: MutableList<RestoCartModel>,
     private val context: Context
 ) : RecyclerView.Adapter<TokoCartAdapter.ViewHolder>(){
 
     private var dialog: Dialog? = null
     private var hapusDialog: OnDeleteClickListener? = null
     interface Dialog {
-        fun onClick(position: Int, list : TokoCartModel)
+        fun onClick(position: Int, list : RestoCartModel)
     }
 
     interface OnDeleteClickListener {
-        fun onDeleteClick(position: Int, note: TokoCartModel)
+        fun onDeleteClick(position: Int, note: RestoCartModel)
     }
 
     fun setOnDeleteClickListener(listener: OnDeleteClickListener) {
@@ -74,12 +72,12 @@ class TokoCartAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val list = listData[position]
         val urlImage = context.getString(R.string.urlImage)
-        val fotoResto = list.foto.toString()
+        val fotoResto = list.resto!!.foto.toString()
         var def = "/public/images/no_image.png"
 
-        holder.nama_toko.text = list.nama_toko.toString().toUpperCase()
-        holder.jml_produk.text = list.cartItems!!.size.toString() + "  Produk"
-        if (list.foto != null) {
+        holder.nama_toko.text = list.resto.namaResto.toString().toUpperCase()
+        holder.jml_produk.text = list.jumlahProduk.toString() + "  Produk"
+        if (list.resto.foto != null) {
             Picasso.get()
                 .load(urlImage+fotoResto)
                 .into(holder.foto)

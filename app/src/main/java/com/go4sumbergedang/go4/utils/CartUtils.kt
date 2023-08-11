@@ -1,42 +1,27 @@
 package com.go4sumbergedang.go4.utils
 
-import com.google.firebase.database.*
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DataSnapshot
+import com.go4sumbergedang.go4.model.ResponseCountCart
+import com.go4sumbergedang.go4.webservices.ApiClient
+import org.greenrobot.eventbus.EventBus
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 object CartUtils {
-    private lateinit var cartReference: DatabaseReference
-    private lateinit var cartListener: ValueEventListener
-    private var countDataListener: CountDataListener? = null
+    private val api = ApiClient.instance()
 
-    interface CountDataListener {
-        fun onCountUpdated(count: Long)
-        fun onError(error: DatabaseError)
-    }
-
-    fun startCountDataListener(userId: String, listener: CountDataListener) {
-        val cartReference = FirebaseDatabase.getInstance().reference.child("cart")
-            .child(userId)
-
-        cartListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val count = dataSnapshot.childrenCount
-                listener.onCountUpdated(count)
+    fun getCartItemCount(idUser: String) {
+        api.getCountCart(idUser).enqueue(object : Callback<ResponseCountCart> {
+            override fun onResponse(call: Call<ResponseCountCart>, response: Response<ResponseCountCart>) {
+                if (response.isSuccessful) {
+                    val itemCount = response.body()?.data ?: 0
+                    EventBus.getDefault().post(CartItemCountEvent(itemCount)) // Post event ke EventBus
+                }
             }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                listener.onError(databaseError)
+            override fun onFailure(call: Call<ResponseCountCart>, t: Throwable) {
+                // Tangani kesalahan jika diperlukan
             }
-        }
-
-        cartReference.addValueEventListener(cartListener)
-        countDataListener = listener
-    }
-
-    fun stopCountDataListener() {
-        if (::cartReference.isInitialized && ::cartListener.isInitialized) {
-            cartReference.removeEventListener(cartListener)
-            countDataListener = null
-        }
+        })
     }
 }

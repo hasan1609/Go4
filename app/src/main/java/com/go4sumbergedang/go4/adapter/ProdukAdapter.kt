@@ -23,7 +23,7 @@ class ProdukAdapter(
 
     private var dialog: Dialog? = null
     interface Dialog {
-        fun onClick(position: Int, namaToko: String, foto: String, produkModel: ProdukModel)
+        fun onClick(position: Int, produkModel: ProdukModel)
     }
 
     fun setDialog(dialog: Dialog) {
@@ -81,7 +81,7 @@ class ProdukAdapter(
             holder.bind(item)
             holder.itemView.setOnClickListener {
                 if (dialog!=null){
-                    dialog!!.onClick(position, restoNearModel.namaResto.toString() , restoNearModel.foto.toString() ,item)
+                    dialog!!.onClick(position ,item)
                 }
             }
         }

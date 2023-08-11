@@ -8,30 +8,22 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.model.CartModel
+import com.go4sumbergedang.go4.model.ItemCartModel
 import com.squareup.picasso.Picasso
-import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
-class CartAdapter (
-    private val listData :MutableList<CartModel>,
+class ItemCartAdapter (
+    private val listData :MutableList<ItemCartModel>,
     private val context: Context
-) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ItemCartAdapter.ViewHolder>() {
 
     private var dialog: Dialog? = null
-    private var subTotal: Int = 0
-
-    init {
-        calculateSubTotal() // Hitung subtotal saat adapter dibuat
-    }
 
     interface Dialog {
-        fun onDelete(position: Int, list: CartModel)
-        fun onClick(position: Int, list: CartModel)
+        fun onDelete(position: Int, list: ItemCartModel)
+        fun onClick(position: Int, list: ItemCartModel)
     }
 
     fun setClick(dialog: Dialog) {
@@ -40,15 +32,6 @@ class CartAdapter (
 
     override fun getItemCount(): Int {
         return listData.size
-    }
-
-    private fun calculateSubTotal() {
-        subTotal = 0
-        for (cartModel in listData) {
-            val hargax = cartModel.harga?.toDoubleOrNull() ?: 0.0
-            val jmlx = cartModel.jumlah ?: 0
-            subTotal += (hargax * jmlx).toInt()
-        }
     }
 
     inner class ViewHolder internal constructor(view: View) : RecyclerView.ViewHolder(view) {
@@ -88,33 +71,32 @@ class CartAdapter (
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cartModel = listData[position]
         val urlImage = context.getString(R.string.urlImage)
-        val foto = cartModel.fotoProduk.toString()
+        val foto = cartModel.resto!!.foto.toString()
         var def = "/public/images/no_image.png"
         val jml = cartModel.jumlah.toString()
 
-        val hargax = cartModel.harga?.toDoubleOrNull() ?: 0.0
-        val jmlx = cartModel.jumlah ?: 0
-        val total = hargax * jmlx
+        val hargax = cartModel.produk!!.harga!!.toDoubleOrNull() ?: 0.0
+        val totalx = cartModel.total!!.toDoubleOrNull() ?: 0.0
         val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
         val symbols = formatter.decimalFormatSymbols
         symbols.currencySymbol = "Rp. "
         formatter.decimalFormatSymbols = symbols
-        val totals = formatter.format(total)
+
+        val totals = formatter.format(totalx)
         val hargas = formatter.format(hargax)
 
-        holder.nama.text = cartModel.namaProduk.toString().toUpperCase()
+        holder.nama.text = cartModel.produk.namaProduk.toString().toUpperCase()
         holder.harga.text = "$hargas x $jml"
         holder.total.text = totals
 
-        subTotal += total.toInt()
 
-        if (cartModel.catatan == "") {
+        if (cartModel.catatan == null) {
             holder.keterangan.visibility = View.GONE
         } else {
             holder.keterangan.visibility = View.VISIBLE
-            holder.keterangan.text = cartModel.catatan
+            holder.keterangan.text = cartModel.catatan.toString()
         }
-        if (cartModel.fotoProduk != null) {
+        if (cartModel.produk.fotoProduk  != null) {
             Picasso.get()
                 .load(urlImage + foto)
                 .into(holder.foto)
@@ -134,9 +116,5 @@ class CartAdapter (
                 dialog!!.onClick(position, cartModel)
             }
         }
-    }
-
-    fun getTotalJumlah(): Int {
-        return subTotal
     }
 }

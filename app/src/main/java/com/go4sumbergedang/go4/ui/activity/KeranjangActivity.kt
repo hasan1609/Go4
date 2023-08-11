@@ -13,24 +13,27 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
+import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityKeranjangBinding
-import com.go4sumbergedang.go4.model.TokoCartModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+import com.go4sumbergedang.go4.model.ResponseCart
+import com.go4sumbergedang.go4.model.ResponseResto
+import com.go4sumbergedang.go4.model.RestoCartModel
+import com.go4sumbergedang.go4.model.RestoNearModel
+import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class KeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityKeranjangBinding
+    var api = ApiClient.instance()
     private lateinit var cartAdapter: TokoCartAdapter
-    private val cartList: MutableList<TokoCartModel> = mutableListOf()
+    private val cartList: MutableList<RestoCartModel> = mutableListOf()
     private lateinit var progressDialog: ProgressDialog
-    private lateinit var cartListener: ValueEventListener
     var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,72 +47,84 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
+        userId = "f3ece8ed-6353-4268-bdce-06ba4c6049fe"
+        getData(userId.toString(), "-7.650450494080474", "112.68361967677231")
+    }
+
+    fun getData(id: String, latitude: String, longitude: String) {
+        loading(true)
         binding.rvProduk.layoutManager = LinearLayoutManager(this)
         binding.rvProduk.setHasFixedSize(true)
         (binding.rvProduk.layoutManager as LinearLayoutManager).orientation =
             LinearLayoutManager.VERTICAL
-        cartAdapter = TokoCartAdapter(cartList, this)
-        binding.rvProduk.adapter = cartAdapter
-    }
 
-    fun getData(id: String) {
-        loading(true)
-        val cartReference = FirebaseDatabase.getInstance().reference
-            .child("cart")
-            .child(id)
-        cartListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                loading(false)
-                cartList.clear()
-                for (tokoSnapshot in dataSnapshot.children) {
-                    val tokoCart = tokoSnapshot.getValue(TokoCartModel::class.java)
-                    if (tokoCart != null) {
-                        // Tambahkan data toko ke list
-                        cartList.add(tokoCart)
+        api.getCart(id, latitude, longitude).enqueue(object : Callback<ResponseCart>{
+            override fun onResponse(
+                call: Call<ResponseCart>,
+                response: Response<ResponseCart>
+            ) {
+                try {
+                    if (response.isSuccessful) {
+                        loading(false)
+                        val data = response.body()
+                        if (data!!.data!!.isEmpty()) {
+                            // Jika data kosong, tampilkan teks kosong
+                            binding.txtKosong.visibility = View.VISIBLE
+                            binding.rvProduk.visibility = View.GONE
+                        } else {
+                            binding.txtKosong.visibility = View.GONE
+                            binding.rvProduk.visibility = View.VISIBLE
+                            for (hasil in data.data!!) {
+                                cartList.add(hasil!!)
+                                cartAdapter = TokoCartAdapter(cartList, this@KeranjangActivity)
+                                binding.rvProduk.adapter = cartAdapter
+                                cartAdapter.notifyDataSetChanged()
+                                cartAdapter.setDialog(object : TokoCartAdapter.Dialog {
+                                    override fun onClick(position: Int, list: RestoCartModel) {
+                                        val gson = Gson()
+                                        val noteJson = gson.toJson(list)
+                                        startActivity<DetailKeranjangActivity>("detailCart" to noteJson)
+                                    }
+                                })
+                                cartAdapter.setOnDeleteClickListener(object :
+                                    TokoCartAdapter.OnDeleteClickListener {
+                                    override fun onDeleteClick(
+                                        position: Int,
+                                        note: RestoCartModel
+                                    ) {
+                                        val builder: AlertDialog.Builder =
+                                            AlertDialog.Builder(this@KeranjangActivity)
+                                        builder.setTitle("Hapus Keranjang")
+                                        builder.setPositiveButton("Ya",
+                                            DialogInterface.OnClickListener { _, _ ->
+                                                deleteData(note.tokoId.toString())
+                                            })
+                                        builder.setNegativeButton("Batal",
+                                            DialogInterface.OnClickListener { dialogInterface, _ ->
+                                                dialogInterface.cancel()
+                                            })
+                                        builder.show()
+                                    }
+                                })
+                                setSwipe()
+                            }
+                        }
+                    } else {
+                        loading(false)
+                        toast("gagal mendapatkan response")
                     }
-                }
-                if (cartList.isEmpty()) {
-                    // Jika data kosong, tampilkan teks kosong
-                    binding.txtKosong.visibility = View.VISIBLE
-                    binding.rvProduk.visibility = View.GONE
-                } else {
-                    // Jika ada data, tampilkan RecyclerView
-                    binding.txtKosong.visibility = View.GONE
-                    binding.rvProduk.visibility = View.VISIBLE
-                    // Update adapter
-                    cartAdapter.notifyDataSetChanged()
-                    cartAdapter.setDialog(object : TokoCartAdapter.Dialog {
-                        override fun onClick(position: Int, list: TokoCartModel) {
-                            val gson = Gson()
-                            val noteJson = gson.toJson(list)
-                            startActivity<DetailKeranjangActivity>("detailCart" to noteJson)
-                        }
-                    })
-                    cartAdapter.setOnDeleteClickListener(object : TokoCartAdapter.OnDeleteClickListener {
-                        override fun onDeleteClick(position: Int, note: TokoCartModel) {
-                            val builder: AlertDialog.Builder = AlertDialog.Builder(this@KeranjangActivity)
-                            builder.setTitle("Hapus Keranjang")
-                            builder.setPositiveButton("Ya",
-                                DialogInterface.OnClickListener { _, _ ->
-                                    deleteData(note.idToko.toString())
-                                })
-                            builder.setNegativeButton("Batal",
-                                DialogInterface.OnClickListener { dialogInterface, _ ->
-                                    dialogInterface.cancel()
-                                })
-                            builder.show()
-                        }
-                    })
-                    setSwipe()
+                } catch (e: Exception) {
+                    loading(false)
+                    info { "hasan ${e.message}" }
+                    toast(e.message.toString())
                 }
             }
-
-            override fun onCancelled(databaseError: DatabaseError) {
+            override fun onFailure(call: Call<ResponseCart>, t: Throwable) {
                 loading(false)
-                toast("Gagal mendapatkan data")
+                info { "hasan ${t.message}" }
+                toast(t.message.toString())
             }
-        }
-        cartReference.addValueEventListener(cartListener)
+        })
     }
 
     fun deleteData(idToko: String) {
@@ -236,15 +251,10 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        userId = "id_user"
-        getData(userId.toString())
+
     }
 
     override fun onPause() {
         super.onPause()
-        val cartReference = FirebaseDatabase.getInstance().reference
-            .child("cart")
-            .child(userId.toString())
-        cartReference.removeEventListener(cartListener)
     }
 }
