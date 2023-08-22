@@ -62,6 +62,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         }
 
         binding.btnBeli.setOnClickListener {
+            showLoadingDialog()
             if (cartItems.isNotEmpty()) {
                 val allItemsInfo = StringBuilder()
                 for (item in cartItems) {
