@@ -72,4 +72,13 @@ interface ApiService {
         @Path("id") id: String
     ): Call<ResponsePostData>
 
+    @GET("notifikasi/{id}")
+    fun getNotifikasiLog(
+        @Path("id") id: String
+    ): Call<ResponseNotifikasiLog>
+
+    @POST("notifikasi/{id}")
+    fun updateNotifikasiStatusLog(
+        @Path("id") id: String
+    ): Call<ResponsePostData>
 }
