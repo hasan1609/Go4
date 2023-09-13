@@ -376,25 +376,25 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
             .build()
 
         val apiService = retrofit.create(ApiService::class.java)
-        val notification = Notification("Test Notification", "This is a test notification from Retrofit")
-        val notificationData = NotificationData(fcmdriverId, notification)
-
-        apiService.sendNotification(notificationData).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.isSuccessful) {
-                    // Notifikasi berhasil dikirim
-                    toast("Notifikasi terkirim ke driver")
-                } else {
-                    // Gagal mengirim notifikasi
-                    toast("Gagal Mengirim Notifikasi")
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                // Tangani kesalahan koneksi atau permintaan
-                toast("Gagal mengirim notifikasi ke driver")
-            }
-        })
+//        val notification = Notification("Test Notification", "This is a test notification from Retrofit")
+//        val notificationData = NotificationData(fcmdriverId, notification)
+//
+//        apiService.sendNotification(notificationData).enqueue(object : Callback<ResponseBody> {
+//            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+//                if (response.isSuccessful) {
+//                    // Notifikasi berhasil dikirim
+//                    toast("Notifikasi terkirim ke driver")
+//                } else {
+//                    // Gagal mengirim notifikasi
+//                    toast("Gagal Mengirim Notifikasi")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+//                // Tangani kesalahan koneksi atau permintaan
+//                toast("Gagal mengirim notifikasi ke driver")
+//            }
+//        })
     }
 
     override fun onStart() {

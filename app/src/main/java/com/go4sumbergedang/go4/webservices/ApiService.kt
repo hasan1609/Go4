@@ -6,13 +6,7 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiService {
-//    Kirim notifikasi
-    @Headers(
-        "Content-Type: application/json",
-        "Authorization: key=AAAARdKDCeY:APA91bHuDQMn4QILQ8-zvcC8zp2et2N1Ii9dvBxqbz-l_pYF3iw5NjlVTQF3eYEUavNi_L0rpfq5FBoGWs-O9hmLBxqi5cl76AKbYhppt2nSGKG0DWldgb461Sp-jzBUztfSLiKsyFvl" // Ganti dengan kunci server FCM Anda
-    )
-    @POST("fcm/send")
-    fun sendNotification(@Body notification: NotificationData): Call<ResponseBody>
+
 // cari resto terderkat
     @GET("nearby/resto/{latitude}&{longitude}")
     fun getRestoTerdekat(
@@ -72,6 +66,12 @@ interface ApiService {
         @Path("id") id: String
     ): Call<ResponsePostData>
 
+    @GET("order/customer/{id}")
+    fun getOrderLog(
+        @Path("id") id: String
+    ): Call<ResponseOrderLog>
+
+
     @GET("notifikasi/{id}")
     fun getNotifikasiLog(
         @Path("id") id: String
@@ -81,4 +81,6 @@ interface ApiService {
     fun updateNotifikasiStatusLog(
         @Path("id") id: String
     ): Call<ResponsePostData>
+
+
 }

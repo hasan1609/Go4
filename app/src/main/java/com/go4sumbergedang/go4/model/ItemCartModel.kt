@@ -29,7 +29,7 @@ data class ItemCartModel(
     val produkId: String? = null,
 
     @field:SerializedName("resto")
-    val resto: DetailResto? = null,
+    val resto: DetailRestoModel? = null,
 
     @field:SerializedName("produk")
     val produk: ProdukModel? = null,
