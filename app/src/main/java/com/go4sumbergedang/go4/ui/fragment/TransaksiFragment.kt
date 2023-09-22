@@ -13,7 +13,7 @@ import com.go4sumbergedang.go4.adapter.RiwayatOrderAdapter
 import com.go4sumbergedang.go4.databinding.FragmentTransaksiBinding
 import com.go4sumbergedang.go4.model.DataLogOrder
 import com.go4sumbergedang.go4.model.ResponseOrderLog
-import com.go4sumbergedang.go4.ui.activity.DetailPesananActivity
+import com.go4sumbergedang.go4.ui.activity.DetailRiwayatOrderActivity
 import com.go4sumbergedang.go4.webservices.ApiClient
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
@@ -71,7 +71,7 @@ class TransaksiFragment : Fragment(), AnkoLogger {
                                 binding.rvTransaksi.adapter = mAdapter
                                 mAdapter.setDialog(object : RiwayatOrderAdapter.Dialog {
                                     override fun onClick(position: Int, idOrder: String) {
-                                        val intent = intentFor<DetailPesananActivity>()
+                                        val intent = intentFor<DetailRiwayatOrderActivity>()
                                             .putExtra("idOrder", idOrder)
                                         startActivity(intent)
                                     }

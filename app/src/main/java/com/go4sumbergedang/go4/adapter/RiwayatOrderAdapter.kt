@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +12,7 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.DataLogOrder
 import com.go4sumbergedang.go4.model.OrderLogModel
 import com.squareup.picasso.Picasso
+import org.w3c.dom.Text
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -45,14 +47,21 @@ class RiwayatOrderAdapter (
     inner class DiverViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // Implement binding and view setup here for motor order
         fun bind(order: OrderLogModel) {
-            // Bind data to views
-            // Example:
-            // itemView.findViewById<TextView>(R.id.textViewOrderID).text = order.idOrder
+            val headerText = itemView.findViewById<TextView>(R.id.txt_header)
+            val headerIc = itemView.findViewById<ImageView>(R.id.ic_header)
             val fotoDriver = itemView.findViewById<ImageView>(R.id.foto_driver)
             val status = itemView.findViewById<TextView>(R.id.txt_status)
+            val review = itemView.findViewById<Button>(R.id.btn_review)
             val urlImage = context.getString(R.string.urlImage)
             val foto= order.detailDriver!!.foto.toString()
             var def = "/public/images/no_image.png"
+            if(order.kategori == "motor"){
+                headerText.text = "MOTOR"
+                headerIc.setImageDrawable(context.getDrawable(R.drawable.ic_motor))
+            }else{
+                headerText.text = "MOBIL"
+                headerIc.setImageDrawable(context.getDrawable(R.drawable.ic_car))
+            }
             if (foto != null) {
                 Picasso.get()
                     .load(urlImage+foto)
@@ -64,7 +73,21 @@ class RiwayatOrderAdapter (
             }
             itemView.findViewById<TextView>(R.id.nama_driver).text = order.driver!!.nama
             itemView.findViewById<TextView>(R.id.txt_tujuan).text = order.alamatTujuan
-            itemView.findViewById<TextView>(R.id.txt_harga).text = order.total
+            val totalx = order.total!!.toDoubleOrNull() ?: 0.0
+            val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
+            val symbols = formatter.decimalFormatSymbols
+            symbols.currencySymbol = "Rp. "
+            formatter.decimalFormatSymbols = symbols
+
+            val totals = formatter.format(totalx)
+            itemView.findViewById<TextView>(R.id.txt_harga).text = totals
+
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val date = dateFormat.parse(order.createdAt!!)
+            val formattedDate = SimpleDateFormat("dd MMM yyyy, HH:mm:ss").format(date!!)
+            itemView.findViewById<TextView>(R.id.txt_tgl).text = formattedDate
+
             when (order.status) {
                 "0" -> {
                     status.text = "Driver menuju ke lokasi penjemputan"
@@ -91,6 +114,9 @@ class RiwayatOrderAdapter (
                     status.setTextColor(context.getColor(R.color.red))
                 }
             }
+            if(order.status == "4" && order.reviewId != null){
+                review.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -99,9 +125,12 @@ class RiwayatOrderAdapter (
         fun bind(order: DataLogOrder) {
             val fotoResto = itemView.findViewById<ImageView>(R.id.foto_resto)
             val status = itemView.findViewById<TextView>(R.id.txt_status)
+            val review = itemView.findViewById<Button>(R.id.btn_review)
             val urlImage = context.getString(R.string.urlImage)
             val foto= order.order!!.detailResto!!.foto.toString()
             var def = "/public/images/no_image.png"
+
+            itemView.findViewById<ImageView>(R.id.ic_header).setImageDrawable(context.getDrawable(R.drawable.ic_food))
             if (foto != null) {
                 Picasso.get()
                     .load(urlImage+foto)
@@ -111,8 +140,11 @@ class RiwayatOrderAdapter (
                     .load(urlImage+def)
                     .into(fotoResto)
             }
+
+            itemView.findViewById<TextView>(R.id.txt_header).text = "RESTO"
+            itemView.findViewById<ImageView>(R.id.ic_header).setImageDrawable(context.getDrawable(R.drawable.ic_food))
             itemView.findViewById<TextView>(R.id.nama_resto).text = order.order.resto!!.nama
-            itemView.findViewById<TextView>(R.id.jml_produk).text = order.count.toString()
+            itemView.findViewById<TextView>(R.id.jml_produk).text = order.count.toString() + " Produk"
 
             val totalx = order.order.total!!.toDoubleOrNull() ?: 0.0
             val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
@@ -159,6 +191,10 @@ class RiwayatOrderAdapter (
                     status.text = "Dibatalkan"
                     status.setTextColor(context.getColor(R.color.red))
                 }
+            }
+
+            if(order.order.status == "4" && order.order.reviewId != null){
+                review.visibility = View.VISIBLE
             }
         }
     }

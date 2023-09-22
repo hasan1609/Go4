@@ -15,7 +15,7 @@ import com.go4sumbergedang.go4.databinding.FragmentNotificationBinding
 import com.go4sumbergedang.go4.model.NotifikasiLogModel
 import com.go4sumbergedang.go4.model.ResponseNotifikasiLog
 import com.go4sumbergedang.go4.model.ResponsePostData
-import com.go4sumbergedang.go4.ui.activity.DetailPesananActivity
+import com.go4sumbergedang.go4.ui.activity.DetailRiwayatOrderActivity
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.firebase.database.*
 import org.jetbrains.anko.AnkoLogger
@@ -72,7 +72,7 @@ class NotificationFragment : Fragment(), AnkoLogger {
                                 mAdapter.notifyDataSetChanged()
                                 mAdapter.setDialog(object : NotifikasiAdapter.Dialog {
                                     override fun onClick(position: Int, idOrder: String, status: String, idNotifikasi: String) {
-                                        val intent = intentFor<DetailPesananActivity>()
+                                        val intent = intentFor<DetailRiwayatOrderActivity>()
                                             .putExtra("idOrder", idOrder)
 
                                         if (status == "0"){

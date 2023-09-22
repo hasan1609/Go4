@@ -7,6 +7,7 @@ import retrofit2.http.*
 
 interface ApiService {
 
+    // TODO: RESTO 
 // cari resto terderkat
     @GET("nearby/resto/{latitude}&{longitude}")
     fun getRestoTerdekat(
@@ -25,6 +26,8 @@ interface ApiService {
         @Path("lat") lat: String,
         @Path("long") long: String,
     ): Call<ResponseResto>
+
+    // TODO: CART 
 //    add to cart
     @FormUrlEncoded
     @POST("cart")
@@ -66,12 +69,19 @@ interface ApiService {
         @Path("id") id: String
     ): Call<ResponsePostData>
 
+    // TODO: ORDER 
     @GET("order/customer/{id}")
     fun getOrderLog(
         @Path("id") id: String
     ): Call<ResponseOrderLog>
+    @GET("order/detail/{id}")
+    fun getDetailOrderLog(
+        @Path("id") id: String
+    ): Call<ResponseDetailLogOrder>
 
 
+
+    // TODO: NOTIFIKASI 
     @GET("notifikasi/{id}")
     fun getNotifikasiLog(
         @Path("id") id: String
