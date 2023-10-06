@@ -1,6 +1,7 @@
 package com.go4sumbergedang.go4.adapter
 
 import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +23,12 @@ class RiwayatOrderAdapter (
     private val context: Context
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
-    private val VIEW_TYPE_DRIVER = 1
-    private val VIEW_TYPE_RESTO = 2
+    private val VIEW_TYPE_HEADER = 1
+    private val VIEW_TYPE_ITEM = 2
+
+
+    private val VIEW_TYPE_DRIVER = 3
+    private val VIEW_TYPE_RESTO = 4
 
     private var dialog: Dialog? = null
     interface Dialog {
@@ -34,28 +39,77 @@ class RiwayatOrderAdapter (
         this.dialog = dialog
     }
 
+    // Data class for header
+    data class OrderHeader(val status: String)
+
+    // Combined list of headers and items
+    private val items: MutableList<Any> = mutableListOf()
+    init {
+        // Separate orders by status and add headers
+        val ordersByStatus = listData.groupBy { it.order?.status }
+
+        // Menambahkan header "Sedang Proses" jika ada pesanan dengan status 0, 1, 2, 3
+        val sedangProsesOrders = ordersByStatus.filterKeys { it in listOf("0", "1", "2", "3") }.values.flatten()
+        if (sedangProsesOrders.isNotEmpty()) {
+            val sedangProsesHeader = OrderHeader("Sedang Proses")
+            items.add(sedangProsesHeader)
+            items.addAll(sedangProsesOrders)
+        }
+
+        // Menambahkan header "Selesai" jika ada pesanan dengan status 4, 5
+        val selesaiOrders = ordersByStatus.filterKeys { it in listOf("4", "5") }.values.flatten()
+        if (selesaiOrders.isNotEmpty()) {
+            val selesaiHeader = OrderHeader("Selesai")
+            items.add(selesaiHeader)
+            items.addAll(selesaiOrders)
+        }
+    }
+
     override fun getItemViewType(position: Int): Int {
-        val order = listData[position]
-        return if (order.order!!.kategori == "resto") VIEW_TYPE_RESTO else VIEW_TYPE_DRIVER
+        val item = items[position]
+        if (item is OrderHeader) {
+            return VIEW_TYPE_HEADER
+        } else if (item is DataLogOrder) {
+            // Tentukan viewType berdasarkan kategori pesanan (motor atau mobil)
+            return if (item.order!!.kategori == "resto") {
+                VIEW_TYPE_RESTO
+            } else {
+                VIEW_TYPE_DRIVER
+            }
+        }
+        // Jika jenis lainnya atau kesalahan, kembalikan viewType default
+        return super.getItemViewType(position)
     }
 
     override fun getItemCount(): Int {
-        return listData.size
+        return items.size
     }
 
+    inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(header: OrderHeader) {
+            val headerText = itemView.findViewById<TextView>(R.id.header_textview)
+
+            val layoutParams = headerText.layoutParams as ViewGroup.MarginLayoutParams
+            headerText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+            layoutParams.setMargins(30, 10, 30, 10)
+            headerText.layoutParams = layoutParams
+            // You can customize the header view here
+            headerText.text = header.status
+        }
+    }
 
     inner class DiverViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // Implement binding and view setup here for motor order
-        fun bind(order: OrderLogModel) {
+        fun bind(order: DataLogOrder) {
             val headerText = itemView.findViewById<TextView>(R.id.txt_header)
             val headerIc = itemView.findViewById<ImageView>(R.id.ic_header)
             val fotoDriver = itemView.findViewById<ImageView>(R.id.foto_driver)
             val status = itemView.findViewById<TextView>(R.id.txt_status)
             val review = itemView.findViewById<Button>(R.id.btn_review)
             val urlImage = context.getString(R.string.urlImage)
-            val foto= order.detailDriver!!.foto.toString()
+            val foto= order.order!!.detailDriver!!.foto.toString()
             var def = "/public/images/no_image.png"
-            if(order.kategori == "motor"){
+            if(order.order.kategori == "motor"){
                 headerText.text = "MOTOR"
                 headerIc.setImageDrawable(context.getDrawable(R.drawable.ic_motor))
             }else{
@@ -71,9 +125,9 @@ class RiwayatOrderAdapter (
                     .load(urlImage+def)
                     .into(fotoDriver)
             }
-            itemView.findViewById<TextView>(R.id.nama_driver).text = order.driver!!.nama
-            itemView.findViewById<TextView>(R.id.txt_tujuan).text = order.alamatTujuan
-            val totalx = order.total!!.toDoubleOrNull() ?: 0.0
+            itemView.findViewById<TextView>(R.id.nama_driver).text = order.order.driver!!.nama
+            itemView.findViewById<TextView>(R.id.txt_tujuan).text = order.order.alamatTujuan
+            val totalx = order.order.total!!.toDoubleOrNull() ?: 0.0
             val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
             val symbols = formatter.decimalFormatSymbols
             symbols.currencySymbol = "Rp. "
@@ -84,11 +138,11 @@ class RiwayatOrderAdapter (
 
             val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
             dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-            val date = dateFormat.parse(order.createdAt!!)
+            val date = dateFormat.parse(order.order.createdAt!!)
             val formattedDate = SimpleDateFormat("dd MMM yyyy, HH:mm:ss").format(date!!)
             itemView.findViewById<TextView>(R.id.txt_tgl).text = formattedDate
 
-            when (order.status) {
+            when (order.order.status) {
                 "0" -> {
                     status.text = "Driver menuju ke lokasi penjemputan"
                     status.setTextColor(context.getColor(R.color.primary_color))
@@ -114,7 +168,7 @@ class RiwayatOrderAdapter (
                     status.setTextColor(context.getColor(R.color.red))
                 }
             }
-            if(order.status == "4" && order.reviewId != null){
+            if(order.order.status == "4" && order.order.reviewId != null){
                 review.visibility = View.VISIBLE
             }
         }
@@ -201,41 +255,58 @@ class RiwayatOrderAdapter (
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_DRIVER -> DiverViewHolder(
+            VIEW_TYPE_HEADER -> HeaderViewHolder(
                 LayoutInflater.from(parent.context).inflate(
+                    R.layout.item_header_rv_produk,
+                    parent,
+                    false
+                )
+            )
+            VIEW_TYPE_DRIVER -> {
+                // Gunakan layout untuk tampilan driver
+                val itemView = LayoutInflater.from(parent.context).inflate(
                     R.layout.list_riwayat_order_driver,
                     parent,
                     false
                 )
-            )
-            VIEW_TYPE_RESTO -> RestoViewHolder(
-                LayoutInflater.from(parent.context).inflate(
+                DiverViewHolder(itemView)
+            }
+            VIEW_TYPE_RESTO -> {
+                // Gunakan layout untuk tampilan resto
+                val itemView = LayoutInflater.from(parent.context).inflate(
                     R.layout.list_riwayat_order_resto,
                     parent,
                     false
                 )
-            )
+                RestoViewHolder(itemView)
+            }
             else -> throw IllegalArgumentException("Invalid view type")
         }
-
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val list = listData[position]
+        val item = items[position]
         when (holder) {
-            is DiverViewHolder -> {
-                // Bind data for motor order
-                holder.bind(list.order!!)
+            is HeaderViewHolder -> {
+                // Bind data for header view holder
+                val header = item as OrderHeader
+                holder.bind(header)
             }
             is RestoViewHolder -> {
-                // Bind data for resto order
-                holder.bind(list)
+                // Bind data for resto item view holder
+                val order = item as DataLogOrder
+                holder.bind(order)
+            }
+            is DiverViewHolder -> {
+                // Bind data for motor item view holder
+                val order = item as DataLogOrder
+                holder.bind(order)
             }
         }
 
         holder.itemView.setOnClickListener {
-            if (dialog!=null){
-                dialog!!.onClick(position, list.order!!.idOrder.toString())
+            if (dialog != null) {
+                dialog!!.onClick(position, (item as DataLogOrder).order?.idOrder.toString())
             }
         }
     }

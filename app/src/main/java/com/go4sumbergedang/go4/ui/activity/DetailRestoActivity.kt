@@ -97,7 +97,7 @@ class DetailRestoActivity : AppCompatActivity() , AnkoLogger{
                             val groupedProduk = groupProdukByKategori(produkList as List<ProdukModel>)
                             binding.rvProduk.visibility = View.VISIBLE
                             binding.txtKosong.visibility = View.GONE
-                            mAdapter = ProdukAdapter(groupedProduk, dataResto,this@DetailRestoActivity)
+                            mAdapter = ProdukAdapter(groupedProduk,this@DetailRestoActivity)
                             binding.rvProduk.adapter = mAdapter
                             mAdapter.setDialog(object : ProdukAdapter.Dialog{
                                 override fun onClick(position: Int, produkModel: ProdukModel) {

@@ -83,4 +83,6 @@ dependencies {
     implementation'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     // event bus
     implementation 'org.greenrobot:eventbus:3.2.0'
+    // viewpager
+//    implementation "androidx.viewpager2:viewpager2:1.0.0"
 }

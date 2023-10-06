@@ -14,7 +14,6 @@ import com.squareup.picasso.Picasso
 
 class ProdukAdapter(
     private val dataList: List<Any>,
-    private val restoNearModel: RestoNearModel,
     private val context: Context
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

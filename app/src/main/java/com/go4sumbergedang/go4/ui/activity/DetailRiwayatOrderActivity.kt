@@ -98,6 +98,10 @@ class DetailRiwayatOrderActivity : AppCompatActivity() , AnkoLogger{
                         binding.txtLokasiJemput.text = data.order.alamatDari.toString()
                         binding.txtOngkir.text = formatter.format(ongkir)
 
+                        if(data.order.status == "0")
+                        {
+                            binding.txtStatus.text = ""
+                        }
 
                     } else {
                         loading(false)
