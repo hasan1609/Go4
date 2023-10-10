@@ -31,7 +31,7 @@
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_detail_pesanan.xml" value="0.2" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_detail_produk.xml" value="0.18" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_detail_resto.xml" value="0.17" />
-        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_detail_riwayat_order.xml" value="0.16" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_detail_riwayat_order.xml" value="0.25" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_keranjang.xml" value="0.1" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_login.xml" value="0.13089005235602094" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/activity_main.xml" value="0.2234375" />
@@ -50,6 +50,7 @@
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/fragment_transaksi_batal.xml" value="0.209375" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/fragment_transaksi_proses.xml" value="0.2234375" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/fragment_transaksi_selesai.xml" value="0.2234375" />
+        <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/item_header_rv_produk.xml" value="0.2234375" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/list_cart.xml" value="0.12" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/list_cart_toko.xml" value="0.17" />
         <entry key="..\:/xampp/htdocs/go4-sumbergedang/android/Go4/app/src/main/res/layout/list_notifikasi.xml" value="0.2234375" />

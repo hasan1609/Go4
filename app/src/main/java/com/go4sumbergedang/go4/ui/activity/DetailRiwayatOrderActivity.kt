@@ -71,8 +71,9 @@ class DetailRiwayatOrderActivity : AppCompatActivity() , AnkoLogger{
                         val symbols = formatter.decimalFormatSymbols
                         symbols.currencySymbol = "Rp. "
                         formatter.decimalFormatSymbols = symbols
-                        val totalx = data!!.order!!.total!!.toDoubleOrNull() ?: 0.0
+                        val subtotalx = data!!.order!!.total!!.toDoubleOrNull() ?: 0.0
                         val ongkir = data.order!!.ongkosKirim!!.toDoubleOrNull() ?: 0.0
+                        val total = subtotalx + ongkir
 
                         if (data.produk == null){
                             binding.tvOngkir.text = "Harga Ojek"
@@ -80,7 +81,6 @@ class DetailRiwayatOrderActivity : AppCompatActivity() , AnkoLogger{
                             binding.lySpace2.visibility = View.GONE
                             binding.lyResto.visibility = View.GONE
                         }else{
-                            binding.txtSubtotal.text = formatter.format(totalx)
                             binding.namaResto.text = data.order.detailResto!!.namaResto.toString()
                             for (hasil in data.produk) {
                                 produkItems.add(hasil!!)
@@ -93,14 +93,47 @@ class DetailRiwayatOrderActivity : AppCompatActivity() , AnkoLogger{
                         dateFormat.timeZone = TimeZone.getTimeZone("UTC")
                         val date = dateFormat.parse(data.order.createdAt.toString())
                         val formattedDate = SimpleDateFormat("dd MMM yyyy, HH:mm:ss").format(date!!)
+                        binding.namaDriver.text = data.order.driver!!.nama.toString()
                         binding.txtTgl.text = formattedDate
                         binding.txtLokasiAntar.text = data.order.alamatTujuan.toString()
                         binding.txtLokasiJemput.text = data.order.alamatDari.toString()
+                        binding.txtSubtotal.text = formatter.format(subtotalx)
                         binding.txtOngkir.text = formatter.format(ongkir)
+                        binding.txtTotal.text = formatter.format(total)
 
-                        if(data.order.status == "0")
-                        {
-                            binding.txtStatus.text = ""
+                        when (data.order.status) {
+                            "0" -> {
+                                if(data.produk == null){
+                                    binding.txtStatus.text = "Driver menuju ke lokasi resto"
+                                }else{
+                                    binding.txtStatus.text = "Driver menuju ke lokasi penjemputan"
+                                }
+                                binding.txtStatus.setTextColor(getColor(R.color.primary_color))
+                            }
+                            "1" -> {
+                                if(data.produk == null){
+                                    binding.txtStatus.text = "Driver sampai di lokasi resto"
+                                }else{
+                                    binding.txtStatus.text = "Driver sampai di lokasi penjemputan"
+                                }
+                                binding.txtStatus.setTextColor(getColor(R.color.primary_color))
+                            }
+                            "2" -> {
+                                binding.txtStatus.text = "Driver sedang menuju lokasi tujuan"
+                                binding.txtStatus.setTextColor(getColor(R.color.primary_color))
+                            }
+                            "3" -> {
+                                binding.txtStatus.text = "Driver telah sampai lokasi tujuan"
+                                binding.txtStatus.setTextColor(getColor(R.color.primary_color))
+                            }
+                            "4" -> {
+                                binding.txtStatus.text = "Selesai"
+                                binding.txtStatus.setTextColor(getColor(R.color.teal_700))
+                            }
+                            else -> {
+                                binding.txtStatus.text = "Dibatalkan"
+                                binding.txtStatus.setTextColor(getColor(R.color.red))
+                            }
                         }
 
                     } else {

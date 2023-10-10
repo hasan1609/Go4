@@ -70,10 +70,17 @@ class TransaksiFragment : Fragment(), AnkoLogger {
                                 mAdapter = RiwayatOrderAdapter(notesList, requireActivity())
                                 binding.rvTransaksi.adapter = mAdapter
                                 mAdapter.setDialog(object : RiwayatOrderAdapter.Dialog {
-                                    override fun onClick(position: Int, idOrder: String) {
-                                        val intent = intentFor<DetailRiwayatOrderActivity>()
-                                            .putExtra("idOrder", idOrder)
-                                        startActivity(intent)
+                                    override fun onClick(position: Int, idOrder: String, status: String) {
+                                        when (status) {
+                                            "0", "1", "2", "3" -> {
+                                                // Tindakan sesuai dengan status tertentu
+                                            }
+                                            else -> {
+                                                val intent = intentFor<DetailRiwayatOrderActivity>()
+                                                    .putExtra("idOrder", idOrder)
+                                                startActivity(intent)
+                                            }
+                                        }
                                     }
                                 })
                                 mAdapter.notifyDataSetChanged()

@@ -1,6 +1,7 @@
 package com.go4sumbergedang.go4.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.DataLogOrder
 import com.go4sumbergedang.go4.model.OrderLogModel
+import com.go4sumbergedang.go4.ui.activity.DetailRiwayatOrderActivity
 import com.squareup.picasso.Picasso
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import org.w3c.dom.Text
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -21,7 +25,7 @@ import java.util.*
 class RiwayatOrderAdapter (
     private val listData :MutableList<DataLogOrder>,
     private val context: Context
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), AnkoLogger{
 
     private val VIEW_TYPE_HEADER = 1
     private val VIEW_TYPE_ITEM = 2
@@ -32,7 +36,7 @@ class RiwayatOrderAdapter (
 
     private var dialog: Dialog? = null
     interface Dialog {
-        fun onClick(position: Int, idOrder : String)
+        fun onClick(position: Int, idOrder : String, status: String)
     }
 
     fun setDialog(dialog: Dialog) {
@@ -306,7 +310,7 @@ class RiwayatOrderAdapter (
 
         holder.itemView.setOnClickListener {
             if (dialog != null) {
-                dialog!!.onClick(position, (item as DataLogOrder).order?.idOrder.toString())
+                dialog!!.onClick(position, (item as DataLogOrder).order?.idOrder.toString(), (item as DataLogOrder).order?.status.toString())
             }
         }
     }

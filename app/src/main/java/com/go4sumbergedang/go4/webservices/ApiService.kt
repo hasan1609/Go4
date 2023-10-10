@@ -69,11 +69,25 @@ interface ApiService {
         @Path("id") id: String
     ): Call<ResponsePostData>
 
-    // TODO: ORDER 
+    // TODO: ORDER
+    // BOOKING
+    @FormUrlEncoded
+    @POST("booking")
+    fun addBooking(
+        @Field("id") id: String,
+        @Field("alamat_tujuan") alamat_tujuan: String,
+        @Field("latitude_tujuan") latitude_tujuan: String,
+        @Field("longitude_tujuan") longitude_tujuan: String,
+        @Field("longitude_dari") longitude_dari: String,
+        @Field("latitude_dari") latitude_dari: String,
+        @Field("alamat_dari") alamat_dari: String,
+    ): Call<ResponsePostData>
+    // GET ORDER LOG
     @GET("order/customer/{id}")
     fun getOrderLog(
         @Path("id") id: String
     ): Call<ResponseOrderLog>
+    // GET ORDER LOG BY ID ORDER
     @GET("order/detail/{id}")
     fun getDetailOrderLog(
         @Path("id") id: String
