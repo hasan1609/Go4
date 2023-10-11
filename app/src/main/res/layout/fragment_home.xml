@@ -104,6 +104,7 @@
                 android:orientation="horizontal">
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/card_motor"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="92dp"
@@ -135,6 +136,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/card_mobil"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="92dp"

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="25dp"
-        android:paddingVertical="10dp"
+        android:paddingVertical="40dp"
         android:gravity="center">
 
         <RelativeLayout
@@ -45,13 +45,5 @@
                 android:layout_below="@+id/txt_tunggu"
                 android:layout_toEndOf="@+id/pg"/>
         </RelativeLayout>
-
-        <Button
-            android:id="@+id/btn_batal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="batal"
-            android:layout_marginTop="8dp"/>
-
     </LinearLayout>
 </androidx.cardview.widget.CardView>

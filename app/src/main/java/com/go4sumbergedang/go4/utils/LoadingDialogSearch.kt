@@ -14,11 +14,7 @@ class LoadingDialogSearch private constructor(context: Context) {
         dialog = Dialog(context)
         dialog?.setContentView(view)
         dialog?.setCancelable(false)
-
-        val btnCancel = view.findViewById<Button>(R.id.btn_batal)
-        btnCancel.setOnClickListener {
-            dismiss()
-        }
+        dialog?.setCanceledOnTouchOutside(false)
     }
 
     fun show() {

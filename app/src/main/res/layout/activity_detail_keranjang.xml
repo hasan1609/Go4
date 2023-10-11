@@ -39,6 +39,7 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/lokasi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
@@ -50,37 +51,37 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="7dp"
-                        android:src="@drawable/ic_pinmap"/>
+                        android:src="@drawable/ic_pinmap" />
 
                     <TextView
-                        android:layout_weight="1"
                         android:id="@+id/txt_lokasi"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:text="dkjkdjfkdjf"
-                        android:textStyle="bold"
-                        android:textSize="17sp"/>
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/ic_arrow"
-                        android:layout_marginStart="10dp"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
                         android:src="@drawable/ic_arrow_forward" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_marginTop="15dp"
                     android:layout_height="3dp"
+                    android:layout_marginTop="15dp"
                     android:background="@color/scndary_color" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="20dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginHorizontal="20dp" >
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="0dp"
@@ -88,34 +89,34 @@
                         android:layout_weight="1"
                         android:text="Rincian Pesanan"
                         android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txt_tambah"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tambah Pesanan"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
                         android:gravity="end"
-                        android:textColor="@color/primary_color"/>
+                        android:text="Tambah Pesanan"
+                        android:textColor="@color/primary_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_cart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
+                    android:layout_marginHorizontal="20dp"
                     android:layout_marginTop="12dp"
-                    android:layout_marginHorizontal="20dp" />
+                    android:nestedScrollingEnabled="false" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="20dp"
                     android:layout_marginTop="13dp"
-                    android:layout_marginHorizontal="20dp" >
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="0dp"
@@ -123,32 +124,32 @@
                         android:layout_weight="1"
                         android:text="SubTotal"
                         android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txt_subTotal_produk"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Rp.100000000"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
                         android:gravity="end"
-                        android:textColor="@color/primary_color"/>
+                        android:text="Rp.100000000"
+                        android:textColor="@color/primary_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_marginTop="15dp"
                     android:layout_height="3dp"
+                    android:layout_marginTop="15dp"
                     android:background="@color/scndary_color" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="20dp"
                     android:layout_marginTop="13dp"
-                    android:layout_marginHorizontal="20dp" >
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="0dp"
@@ -156,17 +157,18 @@
                         android:layout_weight="1"
                         android:text="Ongkos Kirim"
                         android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/txt_ongkir"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Rp.100000000"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
                         android:gravity="end"
-                        android:textColor="@color/primary_color"/>
+                        android:text="Rp.100000000"
+                        android:textColor="@color/primary_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 

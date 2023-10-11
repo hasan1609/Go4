@@ -10,6 +10,7 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.FragmentHomeBinding
 import com.go4sumbergedang.go4.ui.activity.DataRestoTerdekatActivity
 import com.go4sumbergedang.go4.ui.activity.KeranjangActivity
+import com.go4sumbergedang.go4.ui.activity.PilihLokasiActivity
 import com.go4sumbergedang.go4.utils.CartItemCountEvent
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.google.firebase.database.DatabaseError
@@ -40,6 +41,13 @@ class HomeFragment : Fragment(), AnkoLogger {
             startActivity<KeranjangActivity>()
         }
 
+        binding.cardMobil.setOnClickListener {
+            startActivity<PilihLokasiActivity>()
+        }
+
+        binding.cardMotor.setOnClickListener {
+            startActivity<PilihLokasiActivity>()
+        }
         return binding.root
     }
 

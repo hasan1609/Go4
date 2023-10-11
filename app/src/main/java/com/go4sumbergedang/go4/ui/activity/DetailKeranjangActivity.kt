@@ -19,6 +19,7 @@ import com.go4sumbergedang.go4.adapter.ItemCartAdapter
 import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailKeranjangBinding
 import com.go4sumbergedang.go4.model.*
+import com.go4sumbergedang.go4.ui.fragment.DialogLoadingFragment
 import com.go4sumbergedang.go4.utils.AddCartSuccessEvent
 import com.go4sumbergedang.go4.utils.LoadingDialogSearch
 import com.go4sumbergedang.go4.webservices.ApiClient
@@ -33,7 +34,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Field
+import java.lang.Math.*
 import java.text.DecimalFormat
+import kotlin.math.pow
 
 class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityDetailKeranjangBinding
@@ -43,6 +47,8 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var progressDialog: ProgressDialog
     private var loadingDialog: LoadingDialogSearch? = null
     private val cartItems = mutableListOf<ItemCartModel>()
+    private var ongkire = 0.0
+    private var total = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +63,9 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
+        binding.lokasi.setOnClickListener {
+            startActivity<PilihLokasiActivity>()
+        }
         binding.txtTambah.setOnClickListener {
             val intent = intentFor<DetailRestoActivity>()
                 .putExtra("detailToko", detailCart.tokoId)
@@ -64,7 +73,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         }
 
         binding.btnBeli.setOnClickListener {
-            showLoadingDialog()
             if (cartItems.isNotEmpty()) {
                 val allItemsInfo = StringBuilder()
                 for (item in cartItems) {
@@ -72,37 +80,44 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                     allItemsInfo.append(item.idCart).append(",")
                 }
                 info("Semua item dalam RecyclerView:\n$allItemsInfo")
+                showLoadingDialog()
                 api.addBooking(allItemsInfo.toString(),
                     "dsnsnd",
                     "-7.640194875460258",
                     "112.66871766412028",
                     detailCart.resto!!.longitude.toString(),
                     detailCart.resto!!.latitude.toString(),
-                    detailCart.resto!!.alamat.toString()
-                ).enqueue(object : Callback<ResponsePostData> {
+                    detailCart.resto!!.alamat.toString(),
+                    "resto"
+                ).enqueue(object : Callback<ResponseSearchDriver> {
                     override fun onResponse(
-                        call: Call<ResponsePostData>,
-                        response: Response<ResponsePostData>
+                        call: Call<ResponseSearchDriver>,
+                        response: Response<ResponseSearchDriver>
                     ) {
                         if (response.isSuccessful) {
-                            loading(false)
-                            toast("Produk berhasil ditambahkan") // Post event untuk sukses menambahkan item ke keranjang
+                            if (response.body()!!.status != false){
+                                dismissLoadingDialog()
+                                toast("Driver Ditemukan")
+                                startActivity<RouteOrderActivity>()
+                            }else{
+                                dismissLoadingDialog()
+                                toast("Driver Kosong")
+                            }
                         } else {
-                            loading(false)
-                            toast("Gagal menambahkan produk")
+                            dismissLoadingDialog()
+                            toast("Kesalahan Response")
                             info(response.body())
                         }
                     }
 
-                    override fun onFailure(call: Call<ResponsePostData>, t: Throwable) {
-                        loading(false)
+                    override fun onFailure(call: Call<ResponseSearchDriver>, t: Throwable) {
                         toast("Terjadi kesalahan")
                         Log.e("AddProdukActivity", "Error: ${t.localizedMessage}")
+                        dismissLoadingDialog()
                     }
                 })
             } else {
                 info("Tidak ada item dalam RecyclerView")
-                dismissLoadingDialog()
             }
 
         }
@@ -252,6 +267,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                                                             symbols.currencySymbol = "Rp. "
                                                             formatter.decimalFormatSymbols = symbols
                                                             binding.txtSubTotalProduk.text = formatter.format(newTotal)
+                                                            total = newTotal
                                                             if (cartItems.size < 1) {
                                                                 finish() // Jika sisa item hanya 1, selesaikan Activity
                                                             }
@@ -313,11 +329,11 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun calculateTotal(cartItems: MutableList<ItemCartModel>): Double {
-        var total = 0.0
+        var totals = 0.0
         for (item in cartItems) {
-            total += item.total!!.toDoubleOrNull()!!
+            totals += item.total!!.toDoubleOrNull()!!
         }
-        return total
+        return totals
     }
 
     private fun loading(isLoading: Boolean) {
@@ -330,6 +346,28 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
+    private fun hitumgJarakdanOngkir(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Pair<String, Int> {
+        val earthRadius = 6371 // Radius of the Earth in kilometers
+
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+
+        val a = sin(dLat / 2).pow(2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLon / 2).pow(2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        val distance = earthRadius * c
+        val cost = if (distance < 4.0) {
+            8000 // Biaya ongkir jika jarak kurang dari 4 km
+        } else {
+            val additionalDistance = distance - 4.0
+            val additionalCost = (additionalDistance * 3000).toInt()
+            8000 + additionalCost
+        }
+
+        return Pair(String.format("%.2f km", distance), cost)
+    }
+
+
     private fun showLoadingDialog() {
         loadingDialog = LoadingDialogSearch.create(this)
         loadingDialog?.show()
@@ -339,8 +377,30 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         loadingDialog?.dismiss()
     }
 
+
+    private fun getOngkir(lat1: Double, lon1: Double, lat2: Double, lon2: Double) {
+        val (distance, cost) = hitumgJarakdanOngkir(lat1, lon1, lat2, lon2)
+        binding.txtOngkir.text = "Jarak: $distance Biaya Ongkir: Rp. $cost"
+    }
     override fun onStart() {
         super.onStart()
         getData("f3ece8ed-6353-4268-bdce-06ba4c6049fe", detailCart.tokoId.toString())
+        val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
+        val symbols = formatter.decimalFormatSymbols
+        symbols.currencySymbol = "Rp. "
+        formatter.decimalFormatSymbols = symbols
+        if (detailCart.resto!!.distance!! < 4.0) {
+            ongkire = 8000.0
+            binding.txtOngkir.text = formatter.format(8000)
+        } else {
+            val additionalDistance = detailCart.resto!!.distance!! - 4.0
+            val additionalCost = (additionalDistance * 3000).toInt()
+            val ongkir = 8000 + additionalCost
+            ongkire = ongkir.toDouble()
+            binding.txtOngkir.text = formatter.format(ongkir)
+        }
+        val totalX = ongkire + total
+        val formattedTotal = formatter.format(totalX)
+        binding.txtTotalAll.text = formattedTotal
     }
 }

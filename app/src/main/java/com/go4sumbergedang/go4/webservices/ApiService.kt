@@ -81,7 +81,8 @@ interface ApiService {
         @Field("longitude_dari") longitude_dari: String,
         @Field("latitude_dari") latitude_dari: String,
         @Field("alamat_dari") alamat_dari: String,
-    ): Call<ResponsePostData>
+        @Field("kategori") kategori: String
+    ): Call<ResponseSearchDriver>
     // GET ORDER LOG
     @GET("order/customer/{id}")
     fun getOrderLog(
