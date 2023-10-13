@@ -21,8 +21,8 @@
                     <corners
                         android:radius="15dp" />
                     <size
-                        android:width="30dp"
-                        android:height="30dp" />
+                        android:width="40dp"
+                        android:height="40dp" />
                 </shape>
             </item>
 
@@ -33,9 +33,7 @@
                 android:bottom="4dp"
                 android:right="4dp"
                 android:drawable="@drawable/ic_back"
-                android:gravity="center"
-                android:width="16dp"
-                android:height="16dp" />
+                android:gravity="center"/>
         </layer-list>
     </item>
 

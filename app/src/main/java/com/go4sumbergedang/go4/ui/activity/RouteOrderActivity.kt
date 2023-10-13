@@ -17,30 +17,30 @@ class RouteOrderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_route_order)
         binding.lifecycleOwner = this
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout)
-
-        // Atur callback untuk mengelola perubahan state
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                // Di sini Anda dapat menangani perubahan slideOffset
-                // untuk mengatur perilaku bottom sheet saat digeser.
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                // Tangani perubahan state
-                when (newState) {
-                    BottomSheetBehavior.STATE_COLLAPSED -> {
-                        // State setengah
-                    }
-                    BottomSheetBehavior.STATE_EXPANDED -> {
-                        // State penuh
-                    }
-                    // Lainnya sesuai kebutuhan Anda
-                }
-            }
-        })
-
-        // Set initial state (setengah atau penuh)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+//        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout)
+//
+//        // Atur callback untuk mengelola perubahan state
+//        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+//            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+//                // Di sini Anda dapat menangani perubahan slideOffset
+//                // untuk mengatur perilaku bottom sheet saat digeser.
+//            }
+//
+//            override fun onStateChanged(bottomSheet: View, newState: Int) {
+//                // Tangani perubahan state
+//                when (newState) {
+//                    BottomSheetBehavior.STATE_COLLAPSED -> {
+//                        // State setengah
+//                    }
+//                    BottomSheetBehavior.STATE_EXPANDED -> {
+//                        // State penuh
+//                    }
+//                    // Lainnya sesuai kebutuhan Anda
+//                }
+//            }
+//        })
+//
+//        // Set initial state (setengah atau penuh)
+//        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
     }
 }

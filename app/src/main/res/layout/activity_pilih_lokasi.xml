@@ -23,7 +23,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/back"
-                android:layout_gravity="center"
                 android:layout_marginEnd="20dp"/>
 
             <LinearLayout
@@ -31,41 +30,34 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/outlinedJemput"
+                <EditText
+                    android:id="@+id/edt_dari"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Pilih Titik Jemput"
-                    app:startIconDrawable="@drawable/ic_start_order"
-                    app:hintTextColor="@color/grey2"
-                    app:boxStrokeColor="@color/grey2"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edt_jemput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/outlinedAntar"
+                    android:paddingHorizontal="9dp"
+                    android:hint="Pilih Lokasi Jemput"
+                    android:drawablePadding="5dp"
+                    android:background="@drawable/bg_edt_text_transparent"
+                    android:textAppearance="@style/HintStyleEdtText"
+                    android:drawableLeft="@drawable/ic_start_order"
+                    android:drawableRight="@drawable/ic_clear_edt_text"
+                    android:maxLines="1"
+                    android:inputType="textPersonName"
+                    android:layout_marginBottom="5dp"/>
+                <EditText
+                    android:id="@+id/edt_tujuan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Pilih Tujuan"
-                    app:startIconDrawable="@drawable/ic_pinmap"
-                    app:hintTextColor="@color/grey2"
-                    app:boxStrokeColor="@color/grey2"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:paddingHorizontal="9dp"
+                    android:hint="Pilih Lokasi Tujuan"
+                    android:drawablePadding="5dp"
+                    android:background="@drawable/bg_edt_text_transparent"
+                    android:textAppearance="@style/HintStyleEdtText"
+                    android:drawableLeft="@drawable/ic_pinmap"
+                    android:drawableRight="@drawable/ic_clear_edt_text"
+                    android:maxLines="1"
+                    android:inputType="textPersonName"/>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edtAntar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        />
-                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -73,43 +65,61 @@
             android:id="@+id/div1"
             android:layout_width="match_parent"
             android:layout_height="5dp"
+            android:layout_below="@+id/lokasi"
             android:layout_marginVertical="10dp"
-            android:background="@color/grey"
-            android:layout_below="@+id/lokasi"/>
+            android:background="@color/grey" />
 
         <LinearLayout
             android:id="@+id/lokasi_sekarang"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/div1"
-            android:orientation="horizontal"
-            android:layout_marginHorizontal="10dp">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_location"
-                android:layout_marginEnd="10dp"/>
-
-            <TextView
+            android:orientation="vertical"
+            android:layout_below="@id/div1">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Gunakan Lokasi Anda Saat ini"
-                android:textStyle="bold"
-                android:layout_gravity="center"/>
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="10dp">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_location"
+                    android:layout_marginEnd="10dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Gunakan Lokasi Anda Saat ini"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"/>
+                    <TextView
+                        android:id="@+id/alamat_sekarang"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Oke" />
+                </LinearLayout>
+
+            </LinearLayout>
+            <View
+                android:id="@+id/div2"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginVertical="10dp"
+                android:background="@color/grey"/>
         </LinearLayout>
 
-        <View
-            android:id="@+id/div2"
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_marginVertical="10dp"
-            android:background="@color/grey"
-            android:layout_below="@+id/lokasi_sekarang"/>
+
         <Button
             android:id="@+id/btn_maps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_marginHorizontal="10dp"
             android:text="Pilih di peta" />
     </RelativeLayout>
 
