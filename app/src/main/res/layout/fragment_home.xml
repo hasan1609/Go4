@@ -134,39 +134,7 @@
                             android:layout_marginTop="10dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Motor"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/card_mobil"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="92dp"
-                    android:elevation="3dp"
-                    android:layout_marginEnd="10dp"
-                    app:cardCornerRadius="20dp"
-                    android:backgroundTint="@color/primary_color">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="10dp">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/taxi" />
-
-                        <TextView
-                            android:layout_marginTop="10dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Mobil"
+                            android:text="Transportasi"
                             android:textStyle="bold" />
                     </LinearLayout>
 

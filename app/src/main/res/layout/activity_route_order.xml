@@ -8,8 +8,7 @@
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/coordinatorLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent">
+            android:layout_height="match_parent">
 
         <!-- Content area -->
 
@@ -20,22 +19,34 @@
                 android:orientation="vertical"
                 tools:context=".ui.activity.RouteOrderActivity">
                 <!-- Your content goes here -->
+                <LinearLayout
+                    android:id="@+id/peta"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <fragment
+                        android:id="@+id/mapview"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:context=".ui.activity.ActivityMaps"/>
+
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- BottomSheet -->
-<!--            <FrameLayout-->
-<!--                android:id="@+id/bottomSheetLayout"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                app:peekHeight="100dp"-->
-<!--                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">-->
-                <!-- Bottom sheet content goes here -->
+<!--             BottomSheet -->
+            <FrameLayout
+                android:id="@+id/bottomSheetLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-<!--                <include-->
-<!--                    android:id="@+id/contentBottom"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content" />-->
-<!--            </FrameLayout>-->
+                <include
+                    android:id="@+id/contentBottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/bottomsheet_pilih_transport"/>
+            </FrameLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

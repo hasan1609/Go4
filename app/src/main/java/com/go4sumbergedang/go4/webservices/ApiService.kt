@@ -107,5 +107,15 @@ interface ApiService {
         @Path("id") id: String
     ): Call<ResponsePostData>
 
+    // TODO: ONGKIR
+    @FormUrlEncoded
+    @POST("ongkir")
+    fun getOngkir(
+        @Field("lat1") lat1: String,
+        @Field("long1") long1: String,
+        @Field("lat2") lat2: String,
+        @Field("long2") long2: String,
+    ): Call<ResponseOngkir>
+
 
 }

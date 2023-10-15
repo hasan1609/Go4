@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
@@ -19,7 +20,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.model.*
+import kotlinx.android.synthetic.main.activity_maps.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.startActivity
 import java.util.*
 
 class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
@@ -53,11 +56,11 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
             "lokasiJemput" -> "Pilih Lokasi Jemput"
             else -> "Pilih Lokasi Tujuan"
         }
-        binding.icPin.setImageResource(R.drawable.ic_pin_start)
-        binding.icAlamat.setImageResource(R.drawable.ic_start_order)
         if (dataType != "alamatku" && dataType != "lokasiJemput") {
+            binding.tvTujuan.visibility = View.VISIBLE
+            binding.lytujuan.visibility = View.VISIBLE
+            binding.txtAlamat.text = sessionManager.getLokasiDari()
             binding.icPin.setImageResource(R.drawable.ic_pinmap)
-            binding.icAlamat.setImageResource(R.drawable.ic_pinmap)
         }
     }
 
@@ -105,26 +108,28 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
         location.latitude = cameraPosition.latitude
         location.longitude = cameraPosition.longitude
         val address = getAddressFromLocation(location)
-        binding.txtAlamat.text = address
+        if (dataType != "alamatku" && dataType != "lokasiJemput"){
+            binding.txtAlamatTujuan .text = address
+        }else{
+            binding.txtAlamat.text = address
+        }
         binding.btnPilihLokasi.setOnClickListener {
-            when (dataType) {
-                "alamatku" -> {
-                    sessionManager.setLatitude(location.latitude.toString())
-                    sessionManager.setLongitude(location.longitude.toString())
-                    sessionManager.setLokasiSekarang(address)
-                }
-                "lokasiJemput" -> {
-                    sessionManager.setLatitudeDari(location.latitude.toString())
-                    sessionManager.setLongitudeDari(location.longitude.toString())
-                    sessionManager.setLokasiDari(address)
-                }
-                else -> {
-                    sessionManager.setLatitudeTujuan(location.latitude.toString())
-                    sessionManager.setLongitudeTujuan(location.longitude.toString())
-                    sessionManager.setLokasiTujuan(address)
-                }
+            if (dataType == "alamatku") {
+                sessionManager.setLatitude(location.latitude.toString())
+                sessionManager.setLongitude(location.longitude.toString())
+                sessionManager.setLokasiSekarang(address)
+                finish()
+            }else if(dataType == "lokasiJemput") {
+                sessionManager.setLatitudeDari(location.latitude.toString())
+                sessionManager.setLongitudeDari(location.longitude.toString())
+                sessionManager.setLokasiDari(address)
+                finish()
+            } else{
+                sessionManager.setLatitudeTujuan(location.latitude.toString())
+                sessionManager.setLongitudeTujuan(location.longitude.toString())
+                sessionManager.setLokasiTujuan(address)
+                startActivity<RouteOrderActivity>()
             }
-            finish()
         }
     }
 

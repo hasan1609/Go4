@@ -49,12 +49,8 @@ class HomeFragment : Fragment(), AnkoLogger {
             startActivity<KeranjangActivity>()
         }
 
-        binding.cardMobil.setOnClickListener {
-            startActivity<PilihLokasiActivity>()
-        }
-
         binding.cardMotor.setOnClickListener {
-//            startActivity<PilihLokasiActivity>()
+            startActivity<PilihLokasiActivity>()
         }
         return binding.root
     }
