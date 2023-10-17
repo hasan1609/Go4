@@ -17,37 +17,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.ItemCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailKeranjangBinding
-import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.model.*
-import com.go4sumbergedang.go4.ui.fragment.DialogLoadingFragment
-import com.go4sumbergedang.go4.utils.AddCartSuccessEvent
+import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.utils.LoadingDialogSearch
 import com.go4sumbergedang.go4.webservices.ApiClient
-import com.go4sumbergedang.go4.webservices.ApiService
-import com.google.firebase.database.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
-import okhttp3.ResponseBody
-import org.greenrobot.eventbus.EventBus
+import com.google.maps.android.PolyUtil
+import com.squareup.picasso.Picasso
 import org.jetbrains.anko.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Field
-import java.lang.Math.*
 import java.text.DecimalFormat
-import kotlin.math.pow
 
 class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityDetailKeranjangBinding
     var api = ApiClient.instance()
+    lateinit var sessionManager: SessionManager
     private lateinit var detailCart: RestoCartModel
     private lateinit var itemcartAdapter: ItemCartAdapter
     private lateinit var progressDialog: ProgressDialog
     private var loadingDialog: LoadingDialogSearch? = null
     private val cartItems = mutableListOf<ItemCartModel>()
-    private var ongkire = 0.0
+    private var ongkire: Int? = null
     private var total = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +51,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_keranjang)
         binding.lifecycleOwner = this
         progressDialog = ProgressDialog(this)
+        sessionManager = SessionManager(this)
         val gson = Gson()
         detailCart =
             gson.fromJson(intent.getStringExtra("detailCart"), RestoCartModel::class.java)
@@ -63,8 +60,9 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
+        binding.txtLokasi.text = sessionManager.getLokasiSekarang()
         binding.lokasi.setOnClickListener {
-            startActivity<PilihLokasiActivity>()
+            startActivity<ActivityMaps>("type" to "alamatku")
         }
         binding.txtTambah.setOnClickListener {
             val intent = intentFor<DetailRestoActivity>()
@@ -82,13 +80,15 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 info("Semua item dalam RecyclerView:\n$allItemsInfo")
                 showLoadingDialog()
                 api.addBooking(allItemsInfo.toString(),
-                    "dsnsnd",
-                    "-7.640194875460258",
-                    "112.66871766412028",
+                    sessionManager.getLokasiSekarang().toString(),
+                    sessionManager.getLatitude().toString(),
+                    sessionManager.getLongitude().toString(),
                     detailCart.resto!!.longitude.toString(),
                     detailCart.resto!!.latitude.toString(),
                     detailCart.resto!!.alamat.toString(),
-                    "resto"
+                    "resto",
+                    ongkire.toString(),
+                    "f3ece8ed-6353-4268-bdce-06ba4c6049fe"
                 ).enqueue(object : Callback<ResponseSearchDriver> {
                     override fun onResponse(
                         call: Call<ResponseSearchDriver>,
@@ -98,7 +98,10 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                             if (response.body()!!.status != false){
                                 dismissLoadingDialog()
                                 toast("Driver Ditemukan")
-                                startActivity<RouteOrderActivity>()
+                                val gson = Gson()
+                                val noteJoson = gson.toJson(response.body()!!.data)
+                                startActivity<TrackingOrderActivity>("order" to noteJoson)
+                                finish()
                             }else{
                                 dismissLoadingDialog()
                                 toast("Driver Kosong")
@@ -220,8 +223,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.rvCart.setHasFixedSize(true)
         (binding.rvCart.layoutManager as LinearLayoutManager).orientation =
             LinearLayoutManager.VERTICAL
-
-        api.getItemCart(idToko, idUser).enqueue(object : Callback<ResponseItemCart>{
+        api.getItemCart(idToko, idUser, sessionManager.getLatitude().toString(), sessionManager.getLongitude().toString()).enqueue(object : Callback<ResponseItemCart>{
             override fun onResponse(
                 call: Call<ResponseItemCart>,
                 response: Response<ResponseItemCart>
@@ -236,6 +238,9 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                         symbols.currencySymbol = "Rp. "
                         formatter.decimalFormatSymbols = symbols
                         binding.txtSubTotalProduk.text = formatter.format(data!!.totalJumlah)
+                        binding.txtOngkir.text = formatter.format(data.ongkir)
+                        ongkire = data.ongkir
+                        binding.txtTotalAll.text = formatter.format(data.totalAll)
                         for (hasil in data.data!!) {
                             cartItems.add(hasil!!)
                             itemcartAdapter = ItemCartAdapter(cartItems, this@DetailKeranjangActivity)
@@ -325,7 +330,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 toast(t.message.toString())
             }
         })
-
     }
 
     private fun calculateTotal(cartItems: MutableList<ItemCartModel>): Double {
@@ -346,28 +350,6 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
-    private fun hitumgJarakdanOngkir(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Pair<String, Int> {
-        val earthRadius = 6371 // Radius of the Earth in kilometers
-
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
-
-        val a = sin(dLat / 2).pow(2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLon / 2).pow(2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        val distance = earthRadius * c
-        val cost = if (distance < 4.0) {
-            8000 // Biaya ongkir jika jarak kurang dari 4 km
-        } else {
-            val additionalDistance = distance - 4.0
-            val additionalCost = (additionalDistance * 3000).toInt()
-            8000 + additionalCost
-        }
-
-        return Pair(String.format("%.2f km", distance), cost)
-    }
-
-
     private fun showLoadingDialog() {
         loadingDialog = LoadingDialogSearch.create(this)
         loadingDialog?.show()
@@ -377,30 +359,9 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         loadingDialog?.dismiss()
     }
 
-
-    private fun getOngkir(lat1: Double, lon1: Double, lat2: Double, lon2: Double) {
-        val (distance, cost) = hitumgJarakdanOngkir(lat1, lon1, lat2, lon2)
-        binding.txtOngkir.text = "Jarak: $distance Biaya Ongkir: Rp. $cost"
-    }
     override fun onStart() {
         super.onStart()
         getData("f3ece8ed-6353-4268-bdce-06ba4c6049fe", detailCart.tokoId.toString())
-        val formatter = DecimalFormat.getCurrencyInstance() as DecimalFormat
-        val symbols = formatter.decimalFormatSymbols
-        symbols.currencySymbol = "Rp. "
-        formatter.decimalFormatSymbols = symbols
-        if (detailCart.resto!!.distance!! < 4.0) {
-            ongkire = 8000.0
-            binding.txtOngkir.text = formatter.format(8000)
-        } else {
-            val additionalDistance = detailCart.resto!!.distance!! - 4.0
-            val additionalCost = (additionalDistance * 3000).toInt()
-            val ongkir = 8000 + additionalCost
-            ongkire = ongkir.toDouble()
-            binding.txtOngkir.text = formatter.format(ongkir)
-        }
-        val totalX = ongkire + total
-        val formattedTotal = formatter.format(totalX)
-        binding.txtTotalAll.text = formattedTotal
     }
+
 }

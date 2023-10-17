@@ -108,4 +108,44 @@ class SessionManager(private val context: Context?) {
     fun getLongitudeTujuan(): String? {
         return Pref?.getString(isLongitudeTujuan, "")
     }
+
+    private val isCekRouteResto = "isCekRouteResto"
+    fun setCekRouteResto(check: String?) {
+        editor?.putString(isCekRouteResto, check)
+        editor?.commit()
+    }
+
+    fun getCekRouteResto(): String? {
+        return Pref?.getString(isCekRouteResto, "")
+    }
+
+    private val isRoutesResto = "isRoutesResto"
+    fun setRoutesResto(check: String?) {
+        editor?.putString(isRoutesResto, check)
+        editor?.commit()
+    }
+
+    fun getRoutesResto(): String? {
+        return Pref?.getString(isRoutesResto, "")
+    }
+
+    private val isCekRoutesTransport = "isCekRouteTransport"
+    fun setCekRouteTransport(check: String?) {
+        editor?.putString(isCekRoutesTransport, check)
+        editor?.commit()
+    }
+
+    fun getCekRouteTransport(): String? {
+        return Pref?.getString(isCekRoutesTransport, "")
+    }
+
+    private val isRoutesTranport = "isRoutesTranport"
+    fun setRoutesTranport(check: String?) {
+        editor?.putString(isRoutesTranport, check)
+        editor?.commit()
+    }
+
+    fun getRoutesTranport(): String? {
+        return Pref?.getString(isRoutesTranport, "")
+    }
 }

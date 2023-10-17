@@ -23,7 +23,10 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ui.activity.RouteOrderActivity"
+            android:name=".ui.activity.TrackingOrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.CekOngkirOrderActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.PilihLokasiActivity"

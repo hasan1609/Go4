@@ -12,12 +12,17 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.RiwayatOrderAdapter
 import com.go4sumbergedang.go4.databinding.FragmentTransaksiBinding
 import com.go4sumbergedang.go4.model.DataLogOrder
+import com.go4sumbergedang.go4.model.OrderLogModel
 import com.go4sumbergedang.go4.model.ResponseOrderLog
 import com.go4sumbergedang.go4.ui.activity.DetailRiwayatOrderActivity
+import com.go4sumbergedang.go4.ui.activity.TrackingOrderActivity
 import com.go4sumbergedang.go4.webservices.ApiClient
+import com.google.gson.Gson
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.support.v4.intentFor
+import org.jetbrains.anko.support.v4.startActivity
 import org.jetbrains.anko.support.v4.toast
 import retrofit2.Call
 import retrofit2.Callback
@@ -70,15 +75,17 @@ class TransaksiFragment : Fragment(), AnkoLogger {
                                 mAdapter = RiwayatOrderAdapter(notesList, requireActivity())
                                 binding.rvTransaksi.adapter = mAdapter
                                 mAdapter.setDialog(object : RiwayatOrderAdapter.Dialog {
-                                    override fun onClick(position: Int, idOrder: String, status: String) {
+                                    override fun onClick(position: Int, order: OrderLogModel, status: String) {
                                         when (status) {
                                             "0", "1", "2", "3" -> {
-                                                // Tindakan sesuai dengan status tertentu
+                                                val gson = Gson()
+                                                val noteJoson = gson.toJson(order)
+                                                startActivity<TrackingOrderActivity>("order" to noteJoson)
                                             }
                                             else -> {
-                                                val intent = intentFor<DetailRiwayatOrderActivity>()
-                                                    .putExtra("idOrder", idOrder)
-                                                startActivity(intent)
+//                                                val intent = intentFor<DetailRiwayatOrderActivity>()
+//                                                    .putExtra("idOrder", idOrder)
+//                                                startActivity(intent)
                                             }
                                         }
                                     }

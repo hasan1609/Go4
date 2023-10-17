@@ -24,7 +24,7 @@ class OngkirAdapter (
 ) : RecyclerView.Adapter<OngkirAdapter.ViewHolder>(){
 
     private var selectedPosition = -1
-
+    private var selectedOngkirModel: OngkirModel? = null
     override fun getItemCount(): Int {
         return listData.size
     }
@@ -87,6 +87,14 @@ class OngkirAdapter (
                 notifyItemChanged(previousSelected)
                 notifyItemChanged(position)
             }
+        }
+    }
+
+    fun getSelectedOngkirModel(): OngkirModel? {
+        return if (selectedPosition != -1) {
+            listData[selectedPosition]
+        } else {
+            null
         }
     }
 

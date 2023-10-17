@@ -30,33 +30,34 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <EditText
+                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                     android:id="@+id/edt_dari"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="9dp"
                     android:hint="Pilih Lokasi Jemput"
-                    android:drawablePadding="5dp"
                     android:background="@drawable/bg_edt_text_transparent"
-                    android:textAppearance="@style/HintStyleEdtText"
+                    android:completionThreshold="1"
                     android:drawableLeft="@drawable/ic_start_order"
-                    android:drawableRight="@drawable/ic_clear_edt_text"
+                    android:inputType="text"
+                    android:layout_marginBottom="8dp"
+                    android:drawablePadding="5dp"
                     android:maxLines="1"
-                    android:inputType="textPersonName"
-                    android:layout_marginBottom="5dp"/>
-                <EditText
+                    android:textSize="14sp" />
+
+                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                     android:id="@+id/edt_tujuan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="9dp"
                     android:hint="Pilih Lokasi Tujuan"
-                    android:drawablePadding="5dp"
                     android:background="@drawable/bg_edt_text_transparent"
-                    android:textAppearance="@style/HintStyleEdtText"
+                    android:completionThreshold="1"
                     android:drawableLeft="@drawable/ic_pinmap"
-                    android:drawableRight="@drawable/ic_clear_edt_text"
+                    android:inputType="text"
+                    android:drawablePadding="5dp"
                     android:maxLines="1"
-                    android:inputType="textPersonName"/>
+                    android:textSize="14sp" />
 
             </LinearLayout>
         </LinearLayout>
@@ -112,7 +113,6 @@
                 android:layout_marginVertical="10dp"
                 android:background="@color/grey"/>
         </LinearLayout>
-
 
         <Button
             android:id="@+id/btn_maps"

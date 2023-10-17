@@ -32,7 +32,7 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityPilihLokasiBinding
     lateinit var sessionManager: SessionManager
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var geocoder: Geocoder
+    var kategori: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +59,10 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
+        kategori = intent.getStringExtra("kategori")
+        if (kategori != null){
+            binding.edtDari.visibility = View.GONE
+        }
         if (sessionManager.getLokasiDari() != null) {
             binding.edtDari.setText(sessionManager.getLokasiDari())
         }

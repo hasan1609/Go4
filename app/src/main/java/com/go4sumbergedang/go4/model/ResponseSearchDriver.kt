@@ -5,9 +5,8 @@ import com.google.gson.annotations.SerializedName
 data class ResponseSearchDriver(
 
 	@field:SerializedName("data")
-	val data: List<DriverModel?>? = null,
+	val data: OrderLogModel? = null,
 
 	@field:SerializedName("status")
 	val status: Boolean? = null
 )
-

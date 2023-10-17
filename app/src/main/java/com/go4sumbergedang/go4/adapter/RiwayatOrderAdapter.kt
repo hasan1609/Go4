@@ -28,7 +28,6 @@ class RiwayatOrderAdapter (
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), AnkoLogger{
 
     private val VIEW_TYPE_HEADER = 1
-    private val VIEW_TYPE_ITEM = 2
 
 
     private val VIEW_TYPE_DRIVER = 3
@@ -36,7 +35,7 @@ class RiwayatOrderAdapter (
 
     private var dialog: Dialog? = null
     interface Dialog {
-        fun onClick(position: Int, idOrder : String, status: String)
+        fun onClick(position: Int, order: OrderLogModel, status: String)
     }
 
     fun setDialog(dialog: Dialog) {
@@ -92,7 +91,6 @@ class RiwayatOrderAdapter (
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(header: OrderHeader) {
             val headerText = itemView.findViewById<TextView>(R.id.header_textview)
-
             val layoutParams = headerText.layoutParams as ViewGroup.MarginLayoutParams
             headerText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
             layoutParams.setMargins(30, 10, 30, 10)
@@ -113,12 +111,12 @@ class RiwayatOrderAdapter (
             val urlImage = context.getString(R.string.urlImage)
             val foto= order.order!!.detailDriver!!.foto.toString()
             var def = "/public/images/no_image.png"
-            if(order.order.kategori == "motor"){
-                headerText.text = "MOTOR"
-                headerIc.setImageDrawable(context.getDrawable(R.drawable.ic_motor))
-            }else{
+            if(order.order.kategori == "mobil"){
                 headerText.text = "MOBIL"
                 headerIc.setImageDrawable(context.getDrawable(R.drawable.ic_car))
+            }else {
+                headerText.text = "MOTOR"
+                headerIc.setImageDrawable(context.getDrawable(R.drawable.ic_motor))
             }
             if (foto != null) {
                 Picasso.get()
@@ -148,32 +146,34 @@ class RiwayatOrderAdapter (
 
             when (order.order.status) {
                 "0" -> {
-                    status.text = "Driver menuju ke lokasi penjemputan"
-                    status.setTextColor(context.getColor(R.color.primary_color))
+                    status.text = "Menunngu Konfirmasi Driver"
                 }
                 "1" -> {
-                    status.text = "Driver sampai di lokasi penjemputan"
-                    status.setTextColor(context.getColor(R.color.primary_color))
+                    status.text = "Driver menuju lokasi penjemputan"
                 }
                 "2" -> {
                     status.text = "Driver sedang menuju lokasi tujuan"
-                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "3" -> {
-                    status.text = "Sampai Pada tujuan"
-                    status.setTextColor(context.getColor(R.color.primary_color))
+                    status.text = "Driver menuju lokasi pengantaran"
                 }
                 "4" -> {
+                    status.text = "Driver telah sampai pada tujuan"
+                }
+                "5" -> {
                     status.text = "Selesai"
-                    status.setTextColor(context.getColor(R.color.teal_700))
                 }
                 else -> {
                     status.text = "Dibatalkan"
-                    status.setTextColor(context.getColor(R.color.red))
                 }
             }
             if(order.order.status == "4" && order.order.reviewId != null){
                 review.visibility = View.VISIBLE
+            }
+            itemView.setOnClickListener {
+                if (dialog != null) {
+                    dialog!!.onClick(adapterPosition, order.order, order.order.status.toString())
+                }
             }
         }
     }
@@ -254,6 +254,11 @@ class RiwayatOrderAdapter (
             if(order.order.status == "4" && order.order.reviewId != null){
                 review.visibility = View.VISIBLE
             }
+            itemView.setOnClickListener {
+                if (dialog != null) {
+                    dialog!!.onClick(adapterPosition, order.order, order.order.status.toString())
+                }
+            }
         }
     }
 
@@ -305,12 +310,6 @@ class RiwayatOrderAdapter (
                 // Bind data for motor item view holder
                 val order = item as DataLogOrder
                 holder.bind(order)
-            }
-        }
-
-        holder.itemView.setOnClickListener {
-            if (dialog != null) {
-                dialog!!.onClick(position, (item as DataLogOrder).order?.idOrder.toString(), (item as DataLogOrder).order?.status.toString())
             }
         }
     }

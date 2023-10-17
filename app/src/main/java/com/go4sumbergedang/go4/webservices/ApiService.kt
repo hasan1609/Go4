@@ -52,10 +52,12 @@ interface ApiService {
         @Path("long") long: String,
     ): Call<ResponseCart>
 //    get item cart
-    @GET("cart/item/{id}/{user}")
+    @GET("cart/item/{id}/{user}/{lat}/{long}")
     fun getItemCart(
         @Path("id") id: String,
         @Path("user") user: String,
+        @Path("lat") lat: String,
+        @Path("long") long: String
     ): Call<ResponseItemCart>
 //    hapus cart by id resto
     @POST("cart/{id}/{user}")
@@ -70,7 +72,7 @@ interface ApiService {
     ): Call<ResponsePostData>
 
     // TODO: ORDER
-    // BOOKING
+    // BOOKING RESTO
     @FormUrlEncoded
     @POST("booking")
     fun addBooking(
@@ -81,7 +83,23 @@ interface ApiService {
         @Field("longitude_dari") longitude_dari: String,
         @Field("latitude_dari") latitude_dari: String,
         @Field("alamat_dari") alamat_dari: String,
-        @Field("kategori") kategori: String
+        @Field("kategori") kategori: String,
+        @Field("ongkir") ongkir: String,
+        @Field("user_id") user_id: String
+    ): Call<ResponseSearchDriver>
+    // BOOKING DRIVER
+    @FormUrlEncoded
+    @POST("booking")
+    fun addBookingDriver(
+        @Field("alamat_tujuan") alamat_tujuan: String,
+        @Field("latitude_tujuan") latitude_tujuan: String,
+        @Field("longitude_tujuan") longitude_tujuan: String,
+        @Field("longitude_dari") longitude_dari: String,
+        @Field("latitude_dari") latitude_dari: String,
+        @Field("alamat_dari") alamat_dari: String,
+        @Field("kategori") kategori: String,
+        @Field("ongkir") ongkir: String,
+        @Field("user_id") user_id: String
     ): Call<ResponseSearchDriver>
     // GET ORDER LOG
     @GET("order/customer/{id}")
@@ -117,5 +135,6 @@ interface ApiService {
         @Field("long2") long2: String,
     ): Call<ResponseOngkir>
 
+    // TODO: GETROUTE
 
 }

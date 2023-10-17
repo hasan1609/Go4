@@ -67,15 +67,12 @@ data class OrderLogModel(
     @field:SerializedName("driver")
     val driver: UserModel? = null,
 
-    @field:SerializedName("detail_customer")
-    val detailCustomer: DetailCustomerModel? = null,
-
     @field:SerializedName("customer_id")
     val customerId: String? = null,
 
     @field:SerializedName("status")
     val status: String? = null,
 
-    @field:SerializedName("customer")
-    val customer: UserModel? = null
+    @field:SerializedName("routes")
+    val routes: String? = null,
 )

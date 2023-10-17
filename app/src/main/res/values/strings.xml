@@ -9,7 +9,7 @@
     <string name="title_proses">Sedang Proses</string>
     <string name="title_selesai">Selesai</string>
     <string name="title_batal">Dibatalkan</string>
-    <string name="urlImage">http://192.168.2.11/go4-sumbergedang/rest-g4s</string>
+    <string name="urlImage">http://192.168.2.249/go4-sumbergedang/rest-g4s</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps2">Maps2Activity</string>

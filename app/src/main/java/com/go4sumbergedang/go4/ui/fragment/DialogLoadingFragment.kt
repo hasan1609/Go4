@@ -8,11 +8,9 @@ import androidx.fragment.app.DialogFragment
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.ResponseSearchDriver
 import com.go4sumbergedang.go4.webservices.ApiClient
-import kotlinx.android.synthetic.main.custom_dialog_loading.view.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -74,7 +72,9 @@ class DialogLoadingFragment: DialogFragment(), AnkoLogger {
             longitude_dari.toString(),
             latitude_dari.toString(),
             alamat_dari.toString(),
-            kategori.toString()
+            kategori.toString(),
+        "2000",
+            "f3ece8ed-6353-4268-bdce-06ba4c6049fe"
         )
 
         apiCall?.enqueue(object : Callback<ResponseSearchDriver> {

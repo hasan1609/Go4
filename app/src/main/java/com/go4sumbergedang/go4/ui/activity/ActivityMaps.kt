@@ -1,7 +1,6 @@
 package com.go4sumbergedang.go4.ui.activity
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
@@ -19,8 +18,6 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
-import com.google.android.libraries.places.api.model.*
-import kotlinx.android.synthetic.main.activity_maps.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.startActivity
 import java.util.*
@@ -128,7 +125,8 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
                 sessionManager.setLatitudeTujuan(location.latitude.toString())
                 sessionManager.setLongitudeTujuan(location.longitude.toString())
                 sessionManager.setLokasiTujuan(address)
-                startActivity<RouteOrderActivity>()
+                finish()
+                startActivity<CekOngkirOrderActivity>()
             }
         }
     }
@@ -138,6 +136,7 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
             val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
             if (addresses.isNotEmpty()) {
                 return addresses[0].getAddressLine(0) ?: "Alamat tidak ditemukan"
+                binding.btnPilihLokasi.isEnabled = false
             }
         } catch (e: Exception) {
             e.printStackTrace()
