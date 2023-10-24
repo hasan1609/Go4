@@ -5,13 +5,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.go4sumbergedang.go4.R
+import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.ui.fragment.HomeFragment
 import com.go4sumbergedang.go4.ui.fragment.NotificationFragment
 import com.go4sumbergedang.go4.ui.fragment.ProfilFragment
 import com.go4sumbergedang.go4.ui.fragment.TransaksiFragment
 
 class RootActivity : AppCompatActivity() {
-
+    lateinit var sessionManager: SessionManager
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -51,7 +52,7 @@ class RootActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_root)
         val navView: BottomNavigationView = findViewById(R.id.nav_viewhome)
-//        sessionManager = SessionManager(this)
+        sessionManager = SessionManager(this)
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         moveToFragment(HomeFragment())
     }

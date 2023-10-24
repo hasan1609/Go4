@@ -77,14 +77,14 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
                 showLoadingDialog()
                 api.addBookingDriver(
                     sessionManager.getLokasiTujuan().toString(),
-                    sessionManager.getLatitudeDari().toString(),
+                    sessionManager.getLatitudeTujuan().toString(),
                     sessionManager.getLongitudeTujuan().toString(),
                     sessionManager.getLongitudeDari().toString(),
                     sessionManager.getLatitudeDari().toString(),
                     sessionManager.getLokasiDari().toString(),
                     selectedOngkirModel.jenisKendaraan.toString(),
                     selectedOngkirModel.harga.toString(),
-                    "35b9aa9a-8b30-4ffc-a2db-22eb1ecd8566"
+                    sessionManager.getId().toString()
                 ).enqueue(object : Callback<ResponseSearchDriver> {
                     override fun onResponse(
                         call: Call<ResponseSearchDriver>,
@@ -97,6 +97,12 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
                                 val gson = Gson()
                                 val noteJoson = gson.toJson(response.body()!!.data)
                                 startActivity<TrackingOrderActivity>("order" to noteJoson)
+                                sessionManager.setLongitudeDari("")
+                                sessionManager.setLatitudeDari("")
+                                sessionManager.setLongitudeTujuan("")
+                                sessionManager.setLatitudeTujuan("")
+                                sessionManager.setLokasiDari("")
+                                sessionManager.setLokasiTujuan("")
                                 finish()
                             }else{
                                 dismissLoadingDialog()

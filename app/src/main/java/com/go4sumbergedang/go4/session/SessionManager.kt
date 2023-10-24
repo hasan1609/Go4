@@ -10,13 +10,48 @@ class SessionManager(private val context: Context?) {
     var editor: SharedPreferences.Editor? = Pref?.edit()
 
     private val islogin = "login"
-    fun setLogin(check: Boolean) {
-        editor?.putBoolean(islogin, check)
+    fun setLogin(check: Boolean){
+        editor?.putBoolean(islogin,check)
         editor?.commit()
     }
 
-    fun getLogin(): Boolean? {
-        return Pref?.getBoolean(islogin, false)
+    fun getLogin():Boolean?
+    {
+        return Pref?.getBoolean(islogin,false)
+    }
+
+
+    private val isToken = "isToken"
+    fun setToken(check: String){
+        editor?.putString(isToken,check)
+        editor?.commit()
+    }
+
+    fun getToken():String?
+    {
+        return Pref?.getString(isToken,"")
+    }
+
+    private val isId = "isId"
+    fun setId(check: String){
+        editor?.putString(isId,check)
+        editor?.commit()
+    }
+
+    fun getId():String?
+    {
+        return Pref?.getString(isId,"")
+    }
+
+    private val isNama = "isNama"
+    fun setNama(check: String){
+        editor?.putString(isNama,check)
+        editor?.commit()
+    }
+
+    fun getNama():String?
+    {
+        return Pref?.getString(isNama,"")
     }
 
     private val isLokasiSekarang = "isLokasiSekarang"
@@ -147,5 +182,11 @@ class SessionManager(private val context: Context?) {
 
     fun getRoutesTranport(): String? {
         return Pref?.getString(isRoutesTranport, "")
+    }
+
+    fun clearSession() {
+        val editor = Pref?.edit()
+        editor?.clear()
+        editor?.apply()
     }
 }

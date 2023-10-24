@@ -139,6 +139,8 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
                 binding.lokasiSekarang.setOnClickListener {
                     binding.edtDari.setText(address)
                     sessionManager.setLokasiDari(address)
+                    sessionManager.setLatitudeDari(latitude.toString())
+                    sessionManager.setLongitudeDari(longitude.toString())
                 }
             } else {
                 toast("Tidak dapat menemukan alamat")

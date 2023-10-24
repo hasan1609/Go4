@@ -10,6 +10,7 @@ import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.databinding.ActivityDetailProdukBinding
 import com.go4sumbergedang.go4.model.ProdukModel
 import com.go4sumbergedang.go4.model.ResponsePostData
+import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.utils.AddCartSuccessEvent
 import com.go4sumbergedang.go4.utils.CartItemCountEvent
 import com.go4sumbergedang.go4.utils.CartUtils
@@ -30,6 +31,7 @@ import retrofit2.Response
 class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityDetailProdukBinding
     var api = ApiClient.instance()
+    lateinit var sessionManager: SessionManager
     private lateinit var progressDialog: ProgressDialog
     lateinit var produk: ProdukModel
     private var clickCounter: Int = 1
@@ -38,6 +40,7 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_produk)
         binding.lifecycleOwner = this
+        sessionManager = SessionManager(this)
         progressDialog = ProgressDialog(this)
         val gson = Gson()
         produk =
@@ -99,7 +102,7 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
 
         binding.btnKeranjang.setOnClickListener {
             addCart(
-                "f3ece8ed-6353-4268-bdce-06ba4c6049fe",
+                sessionManager.getId().toString(),
                 produk.idProduk.toString(),
                 produk.userId.toString(),
                 produk.harga.toString()
@@ -107,7 +110,7 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
         }
 
         EventBus.getDefault().register(this)
-        CartUtils.getCartItemCount("f3ece8ed-6353-4268-bdce-06ba4c6049fe")
+        CartUtils.getCartItemCount(sessionManager.getId().toString())
     }
 
     private fun addCart(userId: String, produkId: String, tokoId: String, harga: String) {
@@ -159,7 +162,7 @@ class DetailProdukActivity : AppCompatActivity(), AnkoLogger {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onAddCartSuccessEvent(event: AddCartSuccessEvent) {
         // Panggil CartUtils untuk mendapatkan data cart setelah item berhasil ditambahkan
-        CartUtils.getCartItemCount("f3ece8ed-6353-4268-bdce-06ba4c6049fe")
+        CartUtils.getCartItemCount(sessionManager.getId().toString())
     }
 
     private fun loading(isLoading: Boolean) {

@@ -14,6 +14,12 @@ data class ResponseRoutes(
 	val status: String? = null
 )
 
+data class Polyline(
+
+	@field:SerializedName("points")
+	val points: String? = null
+)
+
 data class OverviewPolyline(
 
 	@field:SerializedName("points")
@@ -29,67 +35,31 @@ data class StartLocation(
 	val lat: Any? = null
 )
 
-data class EndLocation(
+data class StepsItem(
 
-	@field:SerializedName("lng")
-	val lng: Any? = null,
+	@field:SerializedName("duration")
+	val duration: Duration? = null,
 
-	@field:SerializedName("lat")
-	val lat: Any? = null
-)
+	@field:SerializedName("start_location")
+	val startLocation: StartLocation? = null,
 
-data class Southwest(
+	@field:SerializedName("distance")
+	val distance: Distance? = null,
 
-	@field:SerializedName("lng")
-	val lng: Any? = null,
+	@field:SerializedName("travel_mode")
+	val travelMode: String? = null,
 
-	@field:SerializedName("lat")
-	val lat: Any? = null
-)
+	@field:SerializedName("html_instructions")
+	val htmlInstructions: String? = null,
 
-data class Polyline(
+	@field:SerializedName("end_location")
+	val endLocation: EndLocation? = null,
 
-	@field:SerializedName("points")
-	val points: String? = null
-)
+	@field:SerializedName("maneuver")
+	val maneuver: String? = null,
 
-data class Northeast(
-
-	@field:SerializedName("lng")
-	val lng: Any? = null,
-
-	@field:SerializedName("lat")
-	val lat: Any? = null
-)
-
-data class Distance(
-
-	@field:SerializedName("text")
-	val text: String? = null,
-
-	@field:SerializedName("value")
-	val value: Int? = null
-)
-
-data class Duration(
-
-	@field:SerializedName("text")
-	val text: String? = null,
-
-	@field:SerializedName("value")
-	val value: Int? = null
-)
-
-data class GeocodedWaypointsItem(
-
-	@field:SerializedName("types")
-	val types: List<String?>? = null,
-
-	@field:SerializedName("geocoder_status")
-	val geocoderStatus: String? = null,
-
-	@field:SerializedName("place_id")
-	val placeId: String? = null
+	@field:SerializedName("polyline")
+	val polyline: Polyline? = null
 )
 
 data class RoutesItem(
@@ -113,16 +83,25 @@ data class RoutesItem(
 	val overviewPolyline: OverviewPolyline? = null,
 
 	@field:SerializedName("waypoint_order")
-	val waypointOrder: List<Any?>? = null
+	val waypointOrder: List<Int?>? = null
 )
 
-data class Bounds(
+data class Distance(
 
-	@field:SerializedName("southwest")
-	val southwest: Southwest? = null,
+	@field:SerializedName("text")
+	val text: String? = null,
 
-	@field:SerializedName("northeast")
-	val northeast: Northeast? = null
+	@field:SerializedName("value")
+	val value: Int? = null
+)
+
+data class Duration(
+
+	@field:SerializedName("text")
+	val text: String? = null,
+
+	@field:SerializedName("value")
+	val value: Int? = null
 )
 
 data class LegsItem(
@@ -155,29 +134,50 @@ data class LegsItem(
 	val trafficSpeedEntry: List<Any?>? = null
 )
 
-data class StepsItem(
+data class Northeast(
 
-	@field:SerializedName("duration")
-	val duration: Duration? = null,
+	@field:SerializedName("lng")
+	val lng: Any? = null,
 
-	@field:SerializedName("start_location")
-	val startLocation: StartLocation? = null,
+	@field:SerializedName("lat")
+	val lat: Any? = null
+)
 
-	@field:SerializedName("distance")
-	val distance: Distance? = null,
+data class GeocodedWaypointsItem(
 
-	@field:SerializedName("travel_mode")
-	val travelMode: String? = null,
+	@field:SerializedName("types")
+	val types: List<String?>? = null,
 
-	@field:SerializedName("html_instructions")
-	val htmlInstructions: String? = null,
+	@field:SerializedName("geocoder_status")
+	val geocoderStatus: String? = null,
 
-	@field:SerializedName("end_location")
-	val endLocation: EndLocation? = null,
+	@field:SerializedName("place_id")
+	val placeId: String? = null
+)
 
-	@field:SerializedName("maneuver")
-	val maneuver: String? = null,
+data class Southwest(
 
-	@field:SerializedName("polyline")
-	val polyline: Polyline? = null
+	@field:SerializedName("lng")
+	val lng: Any? = null,
+
+	@field:SerializedName("lat")
+	val lat: Any? = null
+)
+
+data class EndLocation(
+
+	@field:SerializedName("lng")
+	val lng: Any? = null,
+
+	@field:SerializedName("lat")
+	val lat: Any? = null
+)
+
+data class Bounds(
+
+	@field:SerializedName("southwest")
+	val southwest: Southwest? = null,
+
+	@field:SerializedName("northeast")
+	val northeast: Northeast? = null
 )

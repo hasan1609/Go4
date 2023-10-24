@@ -7,6 +7,26 @@ import retrofit2.http.*
 
 interface ApiService {
 
+    // TODO: AUTH
+    // register
+    @FormUrlEncoded
+    @POST("customer")
+    fun register(
+        @Field("nama") nama: String,
+        @Field("tlp") tlp: String,
+        @Field("email") email: String,
+        @Field("password") password: String,
+    ): Call<ResponseLogin>
+
+    @FormUrlEncoded
+    @POST("login/customer")
+    fun login(
+        @Field("email") email: String,
+        @Field("password") password: String,
+        @Field("fcm") fcm: String
+    ): Call<ResponseLogin>
+
+
     // TODO: RESTO 
 // cari resto terderkat
     @GET("nearby/resto/{latitude}&{longitude}")

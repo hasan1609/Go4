@@ -17,6 +17,7 @@ import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.adapter.TokoCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityKeranjangBinding
 import com.go4sumbergedang.go4.model.*
+import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
@@ -28,6 +29,7 @@ import retrofit2.Response
 class KeranjangActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityKeranjangBinding
     var api = ApiClient.instance()
+    lateinit var sessionManager: SessionManager
     private lateinit var cartAdapter: TokoCartAdapter
     private val cartList: MutableList<RestoCartModel> = mutableListOf()
     private lateinit var progressDialog: ProgressDialog
@@ -39,6 +41,7 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_keranjang)
         binding.lifecycleOwner = this
         progressDialog = ProgressDialog(this)
+        sessionManager = SessionManager(this)
         binding.appBar.btnToKeranjang.visibility = View.GONE
         binding.appBar.titleTextView.text = "Keranjang"
         binding.appBar.backButton.setOnClickListener {
@@ -138,6 +141,7 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
                         }
                     } else {
                         loading(false)
+                        info(response.toString())
                         toast("gagal mendapatkan response")
                     }
                 } catch (e: Exception) {
@@ -263,8 +267,8 @@ class KeranjangActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        userId = "f3ece8ed-6353-4268-bdce-06ba4c6049fe"
-        getData(userId.toString(), "-7.650450494080474", "112.68361967677231")
+        userId = sessionManager.getId().toString()
+        getData(userId.toString(), sessionManager.getLatitude().toString(), sessionManager.getLongitude().toString())
     }
 
     override fun onPause() {

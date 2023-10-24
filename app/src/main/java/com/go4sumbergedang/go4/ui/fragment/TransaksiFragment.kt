@@ -14,6 +14,7 @@ import com.go4sumbergedang.go4.databinding.FragmentTransaksiBinding
 import com.go4sumbergedang.go4.model.DataLogOrder
 import com.go4sumbergedang.go4.model.OrderLogModel
 import com.go4sumbergedang.go4.model.ResponseOrderLog
+import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.ui.activity.DetailRiwayatOrderActivity
 import com.go4sumbergedang.go4.ui.activity.TrackingOrderActivity
 import com.go4sumbergedang.go4.webservices.ApiClient
@@ -32,7 +33,7 @@ class TransaksiFragment : Fragment(), AnkoLogger {
     lateinit var binding: FragmentTransaksiBinding
     var api = ApiClient.instance()
     private lateinit var mAdapter: RiwayatOrderAdapter
-//    lateinit var sessionManager: SessionManager
+    lateinit var sessionManager: SessionManager
     private lateinit var progressDialog: ProgressDialog
 
     override fun onCreateView(
@@ -42,7 +43,7 @@ class TransaksiFragment : Fragment(), AnkoLogger {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_transaksi, container, false)
         binding.lifecycleOwner = this
-//        sessionManager = SessionManager(this)
+        sessionManager = SessionManager(requireActivity())
         progressDialog = ProgressDialog(requireActivity())
 
         return binding.root
@@ -127,6 +128,6 @@ class TransaksiFragment : Fragment(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        getData("f3ece8ed-6353-4268-bdce-06ba4c6049fe")
+        getData(sessionManager.getId().toString())
     }
 }

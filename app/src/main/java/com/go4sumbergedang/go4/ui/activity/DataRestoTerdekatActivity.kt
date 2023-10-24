@@ -11,6 +11,7 @@ import com.go4sumbergedang.go4.adapter.RestoTerdekatAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDataRestoTerdekatBinding
 import com.go4sumbergedang.go4.model.ResponseResto
 import com.go4sumbergedang.go4.model.RestoNearModel
+import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.utils.CartItemCountEvent
 import com.go4sumbergedang.go4.utils.CartUtils
 import com.go4sumbergedang.go4.webservices.ApiClient
@@ -19,6 +20,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.intentFor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,6 +28,7 @@ import retrofit2.Response
 class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityDataRestoTerdekatBinding
     lateinit var mAdapter: RestoTerdekatAdapter
+    lateinit var sessionManager: SessionManager
     var api = ApiClient.instance()
     private lateinit var progressDialog: ProgressDialog
 
@@ -33,9 +36,10 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_data_resto_terdekat)
         binding.lifecycleOwner = this
+        sessionManager = SessionManager(this)
         progressDialog = ProgressDialog(this)
         EventBus.getDefault().register(this)
-        CartUtils.getCartItemCount("f3ece8ed-6353-4268-bdce-06ba4c6049fe")
+        CartUtils.getCartItemCount(sessionManager.getId().toString())
         binding.appBar.titleTextView.text = "Resto Terdekat"
         binding.appBar.backButton.setOnClickListener{
             finish()
@@ -43,7 +47,13 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.btnToKeranjang.setOnClickListener {
             startActivity<KeranjangActivity>()
         }
-        getData("-7.649166","112.682555")
+        if(sessionManager.getLatitude().toString() == "" && sessionManager.getLongitude().toString() == ""){
+            val intent = intentFor<ActivityMaps>()
+                .putExtra("type", "alamatku")
+            startActivity(intent)
+        }else{
+            getData(sessionManager.getLatitude().toString(), sessionManager.getLongitude().toString())
+        }
 
     }
 
