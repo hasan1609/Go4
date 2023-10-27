@@ -79,7 +79,8 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 }
                 info("Semua item dalam RecyclerView:\n$allItemsInfo")
                 showLoadingDialog()
-                api.addBooking(allItemsInfo.toString(),
+                api.addBooking(
+                    allItemsInfo.toString(),
                     sessionManager.getLokasiSekarang().toString(),
                     sessionManager.getLatitude().toString(),
                     sessionManager.getLongitude().toString(),
@@ -115,7 +116,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
 
                     override fun onFailure(call: Call<ResponseSearchDriver>, t: Throwable) {
                         toast("Terjadi kesalahan")
-                        Log.e("AddProdukActivity", "Error: ${t.localizedMessage}")
+                        Log.e("AddProdukActivity", "Error: ${t.message}")
                         dismissLoadingDialog()
                     }
                 })
@@ -361,7 +362,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        getData("f3ece8ed-6353-4268-bdce-06ba4c6049fe", detailCart.tokoId.toString())
+        getData(detailCart.userId.toString(), detailCart.tokoId.toString())
     }
 
 }

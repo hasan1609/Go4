@@ -78,15 +78,15 @@ class TransaksiFragment : Fragment(), AnkoLogger {
                                 mAdapter.setDialog(object : RiwayatOrderAdapter.Dialog {
                                     override fun onClick(position: Int, order: OrderLogModel, status: String) {
                                         when (status) {
-                                            "0", "1", "2", "3" -> {
+                                            "0", "1", "2", "3","4","7" -> {
                                                 val gson = Gson()
                                                 val noteJoson = gson.toJson(order)
                                                 startActivity<TrackingOrderActivity>("order" to noteJoson)
                                             }
                                             else -> {
-//                                                val intent = intentFor<DetailRiwayatOrderActivity>()
-//                                                    .putExtra("idOrder", idOrder)
-//                                                startActivity(intent)
+                                                val intent = intentFor<DetailRiwayatOrderActivity>()
+                                                    .putExtra("idOrder", order.idOrder)
+                                                startActivity(intent)
                                             }
                                         }
                                     }

@@ -52,15 +52,15 @@ class RiwayatOrderAdapter (
         val ordersByStatus = listData.groupBy { it.order?.status }
 
         // Menambahkan header "Sedang Proses" jika ada pesanan dengan status 0, 1, 2, 3
-        val sedangProsesOrders = ordersByStatus.filterKeys { it in listOf("0", "1", "2", "3") }.values.flatten()
+        val sedangProsesOrders = ordersByStatus.filterKeys { it in listOf("0", "1", "2", "3","4","7") }.values.flatten()
         if (sedangProsesOrders.isNotEmpty()) {
             val sedangProsesHeader = OrderHeader("Sedang Proses")
             items.add(sedangProsesHeader)
             items.addAll(sedangProsesOrders)
         }
 
-        // Menambahkan header "Selesai" jika ada pesanan dengan status 4, 5
-        val selesaiOrders = ordersByStatus.filterKeys { it in listOf("4", "5") }.values.flatten()
+        // Menambahkan header "Selesai" jika ada pesanan dengan status 5, 6
+        val selesaiOrders = ordersByStatus.filterKeys { it in listOf("5", "6") }.values.flatten()
         if (selesaiOrders.isNotEmpty()) {
             val selesaiHeader = OrderHeader("Selesai")
             items.add(selesaiHeader)
@@ -146,25 +146,36 @@ class RiwayatOrderAdapter (
 
             when (order.order.status) {
                 "0" -> {
-                    status.text = "Menunngu Konfirmasi Driver"
+                    status.text = "Menunggu Konfirmasi Driver"
+                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "1" -> {
-                    status.text = "Driver menuju lokasi penjemputan"
+                    status.text = "Driver menuju ke lokasi Jemput"
+                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "2" -> {
-                    status.text = "Driver sedang menuju lokasi tujuan"
+                    status.text = "Driver sampai di lokasi Jemput"
+                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "3" -> {
-                    status.text = "Driver menuju lokasi pengantaran"
+                    status.text = "Driver sedang menuju lokasi Tujuan"
+                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "4" -> {
-                    status.text = "Driver telah sampai pada tujuan"
+                    status.text = "Driver telah sampai"
+                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "5" -> {
                     status.text = "Selesai"
+                    status.setTextColor(context.getColor(R.color.teal_700))
+                }
+                "7" -> {
+                    status.text = "Order Diterima"
+                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 else -> {
                     status.text = "Dibatalkan"
+                    status.setTextColor(context.getColor(R.color.red))
                 }
             }
             if(order.order.status == "4" && order.order.reviewId != null){
@@ -226,24 +237,32 @@ class RiwayatOrderAdapter (
             // 5 = batal
             when (order.order.status) {
                 "0" -> {
-                    status.text = "Driver menuju ke lokasi resto"
+                    status.text = "Menunggu Konfirmasi Driver"
                     status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "1" -> {
-                    status.text = "Driver sampai di lokasi resto"
+                    status.text = "Driver menuju ke lokasi resto"
                     status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "2" -> {
-                    status.text = "Driver sedang menuju lokasi pengantaan"
+                    status.text = "Driver sampai di lokasi resto"
                     status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "3" -> {
-                    status.text = "Driver telah sampai"
+                    status.text = "Driver sedang menuju lokasi pengantaan"
                     status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 "4" -> {
+                    status.text = "Driver telah sampai"
+                    status.setTextColor(context.getColor(R.color.primary_color))
+                }
+                "5" -> {
                     status.text = "Selesai"
                     status.setTextColor(context.getColor(R.color.teal_700))
+                }
+                "7" -> {
+                    status.text = "Order Diterima"
+                    status.setTextColor(context.getColor(R.color.primary_color))
                 }
                 else -> {
                     status.text = "Dibatalkan"
