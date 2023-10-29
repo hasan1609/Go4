@@ -99,6 +99,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                             if (response.body()!!.status != false){
                                 dismissLoadingDialog()
                                 toast("Driver Ditemukan")
+                                sessionManager.setisOrderResto(true)
                                 val gson = Gson()
                                 val noteJoson = gson.toJson(response.body()!!.data)
                                 startActivity<TrackingOrderActivity>("order" to noteJoson)

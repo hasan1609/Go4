@@ -1,9 +1,12 @@
 package com.go4sumbergedang.go4.ui.activity
 
+import android.animation.ObjectAnimator
+import android.animation.TypeEvaluator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.go4sumbergedang.go4.R
@@ -17,8 +20,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.database.*
 import com.google.gson.Gson
 import com.google.maps.android.PolyUtil
+import com.google.maps.android.SphericalUtil
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.AnkoLogger
 
@@ -28,7 +33,10 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
     private val api = ApiClient.instance()
     private lateinit var sessionManager: SessionManager
     private lateinit var mMap: GoogleMap
+    private var marker: Marker? = null
     var order: OrderLogModel? = null
+    private lateinit var databaseReference: DatabaseReference
+    private lateinit var valueEventListener: ValueEventListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,8 +103,63 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
         val supportMapFragment =
             (supportFragmentManager.findFragmentById(R.id.mapview) as SupportMapFragment?)!!
         supportMapFragment.getMapAsync(this)
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("perjalanan_pengemudi").child(order!!.driverId.toString())// Ganti "nama_referensi" dengan nama referensi yang sesuai di Firebase Anda.
+        valueEventListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val latitude = dataSnapshot.child("latitude").getValue(Double::class.java)
+                    val longitude = dataSnapshot.child("longitude").getValue(Double::class.java)
+
+                    if (latitude != null && longitude != null) {
+                        updateMapWithLocation(latitude, longitude)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error (optional)
+            }
+        }
+        // Tambahkan pendengar ke referensi Firebase
+        databaseReference.addValueEventListener(valueEventListener)
     }
 
+    private fun updateMapWithLocation(latitude: Double, longitude: Double) {
+        if (marker != null) {
+            val newLocation = LatLng(latitude, longitude)
+            val startPosition = marker!!.position // Posisi awal marker
+            val endPosition = newLocation // Posisi akhir marker (lokasi baru)
+
+            // Hitung arah dan rotasi motor (misalnya, sejajar dengan rute)
+            val bearing = SphericalUtil.computeHeading(startPosition, endPosition)
+
+            // Menghitung jarak antara posisi awal dan akhir
+            val distance = SphericalUtil.computeDistanceBetween(startPosition, endPosition)
+
+            // Animasi motor berjalan dari posisi awal ke posisi akhir dengan interval waktu tertentu
+            val duration = 10000L // Durasi animasi dalam milidetik (2 detik)
+
+            val interpolator = LinearInterpolator()
+            val animator = ObjectAnimator.ofObject(marker, "position",
+                TypeEvaluator<LatLng> { fraction, startValue, endValue ->
+                    return@TypeEvaluator SphericalUtil.interpolate(startValue, endValue,
+                        fraction.toDouble()
+                    )
+                },
+                startPosition, endPosition
+            )
+            animator.duration = duration
+            animator.interpolator = interpolator
+            animator.start()
+
+            // Rotasi motor (menghadap ke arah rute)
+            marker!!.rotation = bearing.toFloat()
+
+            // Anda juga dapat mengatur kamera agar mengikuti perjalanan motor:
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(newLocation))
+        }
+    }
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         val markerTujuan = BitmapDescriptorFactory.fromResource(R.drawable.ic_pinmap)
@@ -111,7 +174,7 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
         val lat3 = order!!.latitudeTujuan!!.toString()
         val long3 = order!!.longitudeTujuan!!.toString()
         if (order!!.kategori == "resto") {
-            mMap.addMarker(
+            marker = mMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(lat1.toDouble(), long1.toDouble()))
                     .title("Titik Awal").icon(markerDriverMotor))
@@ -125,7 +188,7 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
                     .position(LatLng(lat3.toDouble(), long3.toDouble()))
                     .title("Lokasi Tujuan").icon(markerTujuan))
         } else if(order!!.kategori == "mobil") {
-            mMap.addMarker(
+            marker = mMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(lat1.toDouble(), long1.toDouble()))
                     .title("Titik Awal").icon(markerDriverMobil))
@@ -139,7 +202,7 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
                     .position(LatLng(lat3.toDouble(), long3.toDouble()))
                     .title("Lokasi Tujuan").icon(markerTujuan))
         }else if(order!!.kategori == "motor_otomatis" || order!!.kategori == "motor_manual"){
-            mMap.addMarker(
+            marker = mMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(lat1.toDouble(), long1.toDouble()))
                     .title("Lokasi Jemput").icon(markerDriverMotor))
@@ -162,7 +225,6 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
         }
 
     }
-
     fun setRoute(polyline: String){
         val routeColor = ContextCompat.getColor(this, R.color.primary_color)
         val decodedPath = PolyUtil.decode(polyline)
@@ -186,4 +248,9 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
         mMap.moveCamera(cameraUpdate)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // Hentikan pemanggilan data saat aktivitas di-destroy
+        databaseReference.removeEventListener(valueEventListener)
+    }
 }

@@ -47,13 +47,6 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.btnToKeranjang.setOnClickListener {
             startActivity<KeranjangActivity>()
         }
-        if(sessionManager.getLatitude().toString() == "" && sessionManager.getLongitude().toString() == ""){
-            val intent = intentFor<ActivityMaps>()
-                .putExtra("type", "alamatku")
-            startActivity(intent)
-        }else{
-            getData(sessionManager.getLatitude().toString(), sessionManager.getLongitude().toString())
-        }
 
     }
 
@@ -136,4 +129,14 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        if(sessionManager.getLatitude().toString() == "" && sessionManager.getLongitude().toString() == ""){
+            val intent = intentFor<ActivityMaps>()
+                .putExtra("type", "alamatku")
+            startActivity(intent)
+        }else{
+            getData(sessionManager.getLatitude().toString(), sessionManager.getLongitude().toString())
+        }
+    }
 }

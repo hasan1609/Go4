@@ -94,15 +94,11 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
                             if (response.body()!!.status != false){
                                 dismissLoadingDialog()
                                 toast("Driver Ditemukan")
+                                sessionManager.setisOrderTransport(true)
                                 val gson = Gson()
                                 val noteJoson = gson.toJson(response.body()!!.data)
                                 startActivity<TrackingOrderActivity>("order" to noteJoson)
-                                sessionManager.setLongitudeDari("")
-                                sessionManager.setLatitudeDari("")
-                                sessionManager.setLongitudeTujuan("")
-                                sessionManager.setLatitudeTujuan("")
-                                sessionManager.setLokasiDari("")
-                                sessionManager.setLokasiTujuan("")
+                                setSession()
                                 finish()
                             }else{
                                 dismissLoadingDialog()
@@ -182,6 +178,16 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
         )
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        setSession()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        setSession()
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         val markerTujuan = BitmapDescriptorFactory.fromResource(R.drawable.ic_pinmap)
@@ -231,5 +237,14 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
         } else {
             progressDialog.dismiss()
         }
+    }
+
+    fun setSession(){
+        sessionManager.setLongitudeDari("")
+        sessionManager.setLatitudeDari("")
+        sessionManager.setLongitudeTujuan("")
+        sessionManager.setLatitudeTujuan("")
+        sessionManager.setLokasiDari("")
+        sessionManager.setLokasiTujuan("")
     }
 }

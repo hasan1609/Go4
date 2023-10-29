@@ -25,6 +25,11 @@ interface ApiService {
         @Field("password") password: String,
         @Field("fcm") fcm: String
     ): Call<ResponseLogin>
+    // get detail
+    @GET("customer/{id}")
+    fun getDetailCustomer(
+        @Path("id") id: String
+    ): Call<ResponseDetailCustomer>
 
 
     // TODO: RESTO 

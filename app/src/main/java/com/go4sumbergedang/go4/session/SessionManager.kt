@@ -20,7 +20,6 @@ class SessionManager(private val context: Context?) {
         return Pref?.getBoolean(islogin,false)
     }
 
-
     private val isToken = "isToken"
     fun setToken(check: String){
         editor?.putString(isToken,check)
@@ -52,6 +51,17 @@ class SessionManager(private val context: Context?) {
     fun getNama():String?
     {
         return Pref?.getString(isNama,"")
+    }
+
+    private val isFoto = "isFoto"
+    fun setFoto(check: String){
+        editor?.putString(isFoto,check)
+        editor?.commit()
+    }
+
+    fun getFoto():String?
+    {
+        return Pref?.getString(isFoto,"")
     }
 
     private val isLokasiSekarang = "isLokasiSekarang"
@@ -182,6 +192,28 @@ class SessionManager(private val context: Context?) {
 
     fun getRoutesTranport(): String? {
         return Pref?.getString(isRoutesTranport, "")
+    }
+
+    private val isOrderResto = "isOrderResto"
+    fun setisOrderResto(check: Boolean){
+        editor?.putBoolean(isOrderResto,check)
+        editor?.commit()
+    }
+
+    fun getisOrderResto():Boolean?
+    {
+        return Pref?.getBoolean(isOrderResto,false)
+    }
+
+    private val isOrderTransport = "isOrderTransport"
+    fun setisOrderTransport(check: Boolean){
+        editor?.putBoolean(isOrderTransport,check)
+        editor?.commit()
+    }
+
+    fun getisOrderTransport():Boolean?
+    {
+        return Pref?.getBoolean(isOrderTransport,false)
     }
 
     fun clearSession() {

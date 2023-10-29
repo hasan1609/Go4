@@ -28,8 +28,6 @@ class RiwayatOrderAdapter (
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), AnkoLogger{
 
     private val VIEW_TYPE_HEADER = 1
-
-
     private val VIEW_TYPE_DRIVER = 3
     private val VIEW_TYPE_RESTO = 4
 
@@ -178,7 +176,7 @@ class RiwayatOrderAdapter (
                     status.setTextColor(context.getColor(R.color.red))
                 }
             }
-            if(order.order.status == "4" && order.order.reviewId != null){
+            if(order.order.status == "5" && order.order.reviewId != null){
                 review.visibility = View.VISIBLE
             }
             itemView.setOnClickListener {
@@ -229,12 +227,6 @@ class RiwayatOrderAdapter (
             val date = dateFormat.parse(order.order.createdAt!!)
             val formattedDate = SimpleDateFormat("dd MMM yyyy, HH:mm:ss").format(date!!)
             itemView.findViewById<TextView>(R.id.txt_tgl).text = formattedDate
-            // 0 = driver ke toko
-            // 1 = driver sampai toko
-            // 2 = driver mengantar
-            // 3 = driver sampai
-            // 4 = selesai
-            // 5 = batal
             when (order.order.status) {
                 "0" -> {
                     status.text = "Menunggu Konfirmasi Driver"
@@ -270,7 +262,7 @@ class RiwayatOrderAdapter (
                 }
             }
 
-            if(order.order.status == "4" && order.order.reviewId != null){
+            if(order.order.status == "5" && order.order.reviewId != null){
                 review.visibility = View.VISIBLE
             }
             itemView.setOnClickListener {

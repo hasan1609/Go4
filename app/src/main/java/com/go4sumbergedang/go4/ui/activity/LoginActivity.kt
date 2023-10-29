@@ -80,6 +80,7 @@ class LoginActivity : AppCompatActivity() , AnkoLogger{
                                     sessionManager.setToken(response.body()!!.token!!)
                                     sessionManager.setId(response.body()!!.data!!.idUser!!)
                                     sessionManager.setNama(response.body()!!.data!!.nama.toString())
+                                    sessionManager.setFoto(response.body()!!.data!!.nama.toString())
                                     sessionManager.setLogin(true)
                                     loading(false)
                                     toast("login berhasil")

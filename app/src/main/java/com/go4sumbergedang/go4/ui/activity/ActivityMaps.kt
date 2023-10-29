@@ -20,6 +20,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.toast
 import java.util.*
 
 class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
@@ -53,11 +54,17 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
             "lokasiJemput" -> "Pilih Lokasi Jemput"
             else -> "Pilih Lokasi Tujuan"
         }
-        if (dataType != "alamatku" && dataType != "lokasiJemput") {
-            binding.tvTujuan.visibility = View.VISIBLE
-            binding.lytujuan.visibility = View.VISIBLE
-            binding.txtAlamat.text = sessionManager.getLokasiDari()
+        if (dataType !=  "lokasiTujuan") {
+            binding.tvTujuan.visibility = View.GONE
+            binding.lytujuan.visibility = View.GONE
+            binding.icPin.setImageResource(R.drawable.ic_pin_start)
+            if (dataType == "alamatku") {
+                binding.txtLokasiJemput.text = "Lokasi Anda / Lokasi Antar"
+                binding.txtAlamat.text = sessionManager.getLokasiSekarang()
+            }
+        }else{
             binding.icPin.setImageResource(R.drawable.ic_pinmap)
+            binding.txtAlamat.text = sessionManager.getLokasiDari()
         }
     }
 
@@ -120,13 +127,30 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
                 sessionManager.setLatitudeDari(location.latitude.toString())
                 sessionManager.setLongitudeDari(location.longitude.toString())
                 sessionManager.setLokasiDari(address)
-                finish()
+                if (sessionManager.getLokasiTujuan().isNullOrEmpty()) {
+                    finish()
+                }else{
+                    startActivity<CekOngkirOrderActivity>()
+                    finish()
+                }
+
             } else{
                 sessionManager.setLatitudeTujuan(location.latitude.toString())
                 sessionManager.setLongitudeTujuan(location.longitude.toString())
                 sessionManager.setLokasiTujuan(address)
-                finish()
-                startActivity<CekOngkirOrderActivity>()
+                if (sessionManager.getLokasiDari().isNullOrEmpty()) {
+                    // Lokasi Dari masih kosong, pilih lokasi lokasiJemput
+                    dataType = "lokasiJemput" // Ubah dataType sesuai kebutuhan
+                    binding.tvTujuan.visibility = View.VISIBLE
+                    binding.lytujuan.visibility = View.VISIBLE
+                    binding.icPin.setImageResource(R.drawable.ic_pin_start)
+                    binding.txtAlamat.text = ""
+                    // Anda mungkin perlu mengatur teks lain sesuai dengan kondisi
+                    binding.btnPilihLokasi.text = "Pilih Lokasi Jemput"
+                } else {
+                    finish()
+                    startActivity<CekOngkirOrderActivity>()
+                }
             }
         }
     }
@@ -142,5 +166,17 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
             e.printStackTrace()
         }
         return "Alamat tidak ditemukan"
+    }
+
+    override fun onBackPressed() {
+        if (dataType == "alamatku" && sessionManager.getLokasiSekarang().isNullOrBlank()) {
+            // Lokasi Sekarang belum diisi, beri tindakan yang sesuai
+            // Misalnya, menampilkan pesan atau tindakan lainnya.
+            toast("Harap pilih Lokasi Sekarang.")
+        } else {
+            mMap.clear()
+            super.onBackPressed()
+            finish()
+        }
     }
 }
