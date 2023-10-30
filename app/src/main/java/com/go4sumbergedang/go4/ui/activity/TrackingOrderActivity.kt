@@ -26,6 +26,7 @@ import com.google.maps.android.PolyUtil
 import com.google.maps.android.SphericalUtil
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.startActivity
 
 class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallback {
     private lateinit var binding: ActivityTrackingOrderBinding
@@ -77,6 +78,9 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
         binding.contentBottom.txtPlat.text = order!!.detailDriver!!.platNo
         binding.contentBottom.txtKendaraan.text = order!!.detailDriver!!.kendaraan
         binding.contentBottom.nama.text = order!!.driver!!.nama
+        binding.contentBottom.chat.setOnClickListener {
+            startActivity<ChatActivity>("order" to intent.getStringExtra("order"))
+        }
         when (order!!.kategori) {
             "resto" -> binding.contentBottom.type.setImageResource(R.drawable.makanan)
             "mobil" -> binding.contentBottom.type.setImageResource(R.drawable.mobil)

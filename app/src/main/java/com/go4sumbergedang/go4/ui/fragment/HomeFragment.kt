@@ -99,6 +99,12 @@ class HomeFragment : Fragment(), AnkoLogger {
         binding.cardMotor.setOnClickListener {
             startActivity<PilihLokasiActivity>()
         }
+        binding.cardWifi.setOnClickListener {
+            toast("Segera hadir")
+        }
+        binding.pokmas1.setOnClickListener {
+            toast("Segera hadir")
+        }
         return binding.root
     }
 

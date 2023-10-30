@@ -82,6 +82,9 @@ class LoginActivity : AppCompatActivity() , AnkoLogger{
                                     sessionManager.setNama(response.body()!!.data!!.nama.toString())
                                     sessionManager.setFoto(response.body()!!.data!!.nama.toString())
                                     sessionManager.setLogin(true)
+                                    if (response.body()!!.data!!.detailCustomer!!.foto != null){
+                                        sessionManager.setFoto(response.body()!!.data!!.detailCustomer!!.foto.toString())
+                                    }
                                     loading(false)
                                     toast("login berhasil")
                                     startActivity<RootActivity>()

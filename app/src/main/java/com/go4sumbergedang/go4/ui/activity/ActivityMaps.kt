@@ -174,7 +174,6 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
             // Misalnya, menampilkan pesan atau tindakan lainnya.
             toast("Harap pilih Lokasi Sekarang.")
         } else {
-            mMap.clear()
             super.onBackPressed()
             finish()
         }

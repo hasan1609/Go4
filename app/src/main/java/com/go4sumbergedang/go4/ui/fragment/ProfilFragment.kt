@@ -1,5 +1,6 @@
 package com.go4sumbergedang.go4.ui.fragment
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -16,6 +17,7 @@ import com.squareup.picasso.Picasso
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.support.v4.startActivity
+import org.jetbrains.anko.support.v4.toast
 
 class ProfilFragment : Fragment(), AnkoLogger {
     private lateinit var binding: FragmentProfilBinding
@@ -36,15 +38,28 @@ class ProfilFragment : Fragment(), AnkoLogger {
             Picasso.get()
                 .load(urlImage+foto)
                 .into(binding.foto)
+        }else{
+            Picasso.get()
+                .load(urlImage+def)
+                .into(binding.foto)
         }
         binding.tvNamaUser.text = sessionManager.getNama().toString()
         binding.lySetAkun.setOnClickListener {
             startActivity<DetailAkunActivity>()
         }
         binding.txtLogout.setOnClickListener {
-            sessionManager.clearSession()
-            startActivity<LoginActivity>()
-            requireActivity().finish()
+            val builder = AlertDialog.Builder(requireActivity())
+            builder.setMessage("Logout ? ")
+            builder.setPositiveButton("Ok") { dialog, which ->
+                sessionManager.clearSession()
+                startActivity<LoginActivity>()
+                toast("Berhasil Logout")
+                requireActivity().finish()
+            }
+            builder.setNegativeButton("Batal") { dialog, which ->
+                dialog.dismiss()
+            }
+            builder.show()
         }
         return binding.root
     }
@@ -57,5 +72,22 @@ class ProfilFragment : Fragment(), AnkoLogger {
         } else {
             progressDialog.dismiss()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val urlImage = requireActivity().getString(R.string.urlImage)
+        val foto= sessionManager.getFoto()
+        var def = "/public/images/no_image.png"
+        if (foto != "") {
+            Picasso.get()
+                .load(urlImage+foto)
+                .into(binding.foto)
+        }else{
+            Picasso.get()
+                .load(urlImage+def)
+                .into(binding.foto)
+        }
+        binding.tvNamaUser.text = sessionManager.getNama().toString()
     }
 }

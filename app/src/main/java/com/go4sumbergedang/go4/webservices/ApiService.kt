@@ -1,6 +1,8 @@
 package com.go4sumbergedang.go4.webservices
 
 import com.go4sumbergedang.go4.model.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
@@ -31,6 +33,22 @@ interface ApiService {
         @Path("id") id: String
     ): Call<ResponseDetailCustomer>
 
+    @Multipart
+    @POST("customer/{id}")
+    fun updateCustomerWithFoto(
+        @Path("id") id: String,
+        @Part("nama") nama: RequestBody,
+        @Part("alamat") alamat: RequestBody,
+        @Part foto: MultipartBody.Part?
+    ): Call<ResponseUpdateProfil>
+
+    @FormUrlEncoded
+    @POST("customer/{id}")
+    fun updateCustomerNofoto(
+        @Path("id") id: String,
+        @Field("nama") nama: String,
+        @Field("alamat") alamat: String,
+        ): Call<ResponseUpdateProfil>
 
     // TODO: RESTO 
 // cari resto terderkat

@@ -86,7 +86,7 @@ class ItemCartAdapter (
         val totals = formatter.format(totalx)
         val hargas = formatter.format(hargax)
 
-        holder.nama.text = cartModel.produk.namaProduk.toString().toUpperCase()
+        holder.nama.text = cartModel.produk.namaProduk.toString().uppercase(Locale.getDefault())
         holder.harga.text = "$hargas x $jml"
         holder.total.text = totals
 

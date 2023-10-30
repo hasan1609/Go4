@@ -50,7 +50,7 @@ class RegisterActivity : AppCompatActivity() , AnkoLogger{
 
     }
 
-    private fun register(email: String, password: String, nama: String, tlp: String) {
+        private fun register(email: String, password: String, nama: String, tlp: String) {
         loading(true)
         api.register(nama,tlp,email,password).enqueue(object : Callback<ResponseLogin> {
             override fun onResponse(
