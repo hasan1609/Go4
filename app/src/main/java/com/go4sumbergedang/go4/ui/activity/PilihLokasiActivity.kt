@@ -1,9 +1,10 @@
 package com.go4sumbergedang.go4.ui.activity
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.text.Editable
@@ -12,35 +13,50 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.go4sumbergedang.go4.R
+import com.go4sumbergedang.go4.adapter.LokasiAdapter
 import com.go4sumbergedang.go4.databinding.ActivityPilihLokasiBinding
 import com.go4sumbergedang.go4.session.SessionManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.RectangularBounds
+import com.google.android.libraries.places.api.model.TypeFilter
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
+import kotlinx.android.synthetic.main.custom_alert_search_driver.*
+import org.jetbrains.anko.*
 
 class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var binding: ActivityPilihLokasiBinding
     lateinit var sessionManager: SessionManager
+    lateinit var progressDialog: ProgressDialog
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    var kategori: String? = null
+    private lateinit var placesClient: PlacesClient
+    private val locationSuggestions = ArrayList<String>()
+    private val placeIds = ArrayList<String>()
+    private lateinit var lokasiAdapter: LokasiAdapter
+    private var activeEditText: EditText? = null  // Menyimpan referensi ke EditText yang aktif
+    private val COMPOUND_DRAWABLE_RIGHT_INDEX = 2
+    var southwest: LatLng? = null
+    var northeast: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pilih_lokasi)
         binding.lifecycleOwner = this
         sessionManager = SessionManager(this)
+        progressDialog = ProgressDialog(this)
 
         Places.initialize(this, getString(R.string.google_maps_key))
+        placesClient = Places.createClient(this)
         // Inisialisasi FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         // Cek izin lokasi
@@ -55,14 +71,89 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
         binding.back.setOnClickListener { onBackPressed() }
         setupEditTextFocus(binding.edtDari, "lokasiJemput")
         setupEditTextFocus(binding.edtTujuan, "lokasiTujuan")
+        binding.edtDari.makeClearableEditText(null, null)
+        binding.edtTujuan.makeClearableEditText(null, null)
+
+        // Inisialisasi RecyclerView
+        lokasiAdapter = LokasiAdapter(this, locationSuggestions, placeIds, object : LokasiAdapter.ItemClickListener {
+            override fun onItemClick(location: String, placeId: String) {
+                activeEditText?.setText(location) // Misalnya, set lokasi terpilih ke EditText yang aktif
+                var type = ""
+                if (activeEditText == binding.edtDari){
+                    type = "lokasiJemput"
+                }else if (activeEditText == binding.edtTujuan){
+                    type = "lokasiTujuan"
+                }
+
+                val intent = intentFor<ActivityMaps>()
+                    .putExtra("type", type)
+                    .putExtra("placeId", placeId) // Gantilah placeId dengan nilai yang sesuai
+                startActivity(intent)
+            }
+        })
+
+        binding.rvLokasi.layoutManager = LinearLayoutManager(this@PilihLokasiActivity)
+        binding.rvLokasi.adapter = lokasiAdapter
+
+        // Menghubungkan TextWatcher ke edtDari
+        binding.edtDari.addTextChangedListener(getTextWatcher(binding.edtDari))
+        binding.edtTujuan.addTextChangedListener(getTextWatcher(binding.edtTujuan))
+    }
+
+    private fun getTextWatcher(editText: EditText) = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(s: Editable?) {
+            activeEditText = editText
+            updateRecyclerViewWithPredictions(s.toString(), editText)
+        }
+    }
+
+    // Fungsi untuk mengupdate RecyclerView dengan prediksi lokasi
+    private fun updateRecyclerViewWithPredictions(query: String, editText: EditText) {
+//        // Membuat AutocompleteFilter yang memungkinkan tempat kecil
+        val token = AutocompleteSessionToken.newInstance()
+//        // Membuat FindAutocompletePredictionsRequest dengan token
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setTypeFilter(TypeFilter.ESTABLISHMENT)
+//            .setLocationBias(
+//                RectangularBounds.newInstance(
+//                    latlong1,
+//                    latlong2
+//                )
+//            )
+            .setSessionToken(token)
+            .setCountry("ID")
+            .setQuery(query)
+            .build()
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener { response ->
+            val predictions = response.autocompletePredictions
+            // Perbarui RecyclerView sesuai dengan EditText yang sedang aktif
+            if (activeEditText == editText) {
+//                info(predictions.map { it.getFullText(null).toString() })
+//                locationSuggestions.clear()
+//                locationSuggestions.addAll(predictions.map { it.getFullText(null).toString() })
+//                lokasiAdapter.notifyDataSetChanged()
+//                info(predictions.map { it.placeId })
+                if (activeEditText == editText) {
+                    info(predictions.map { it.getFullText(null).toString() })
+                    locationSuggestions.clear()
+                    locationSuggestions.addAll(predictions.map { it.getFullText(null).toString() })
+                    placeIds.clear()
+                    placeIds.addAll(predictions.map { it.placeId.toString() })
+                    lokasiAdapter.notifyDataSetChanged()
+                    info(predictions.map { it.placeId })
+                }
+            }
+        }.addOnFailureListener { exception ->
+            // Tangani kesalahan saat mengambil prediksi.
+            exception.printStackTrace()
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        kategori = intent.getStringExtra("kategori")
-        if (kategori != null){
-            binding.edtDari.visibility = View.GONE
-        }
         if (sessionManager.getLokasiDari() != null) {
             binding.edtDari.setText(sessionManager.getLokasiDari())
         }
@@ -70,9 +161,6 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
             binding.edtTujuan.setText(sessionManager.getLokasiTujuan())
         }
         setFocusOnEmptyEditText()
-        // Set visibilitas awal lokasiSekarang berdasarkan fokus edtDari
-        binding.lokasiSekarang.visibility = if (binding.edtDari.hasFocus()) View.VISIBLE else View.GONE
-
     }
 
     private fun setupEditTextFocus(editText: EditText, type: String) {
@@ -82,7 +170,13 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
                 binding.btnMaps.setOnClickListener {
                     startActivity<ActivityMaps>("type" to type)
                 }
-                binding.lokasiSekarang.visibility = if (editText == binding.edtDari) View.VISIBLE else View.GONE
+                if (editText == binding.edtDari){
+                    binding.lyLokasiSekarang.visibility = View.VISIBLE
+                    binding.div2.visibility = View.VISIBLE
+                }else if(editText == binding.edtTujuan){
+                    binding.lyLokasiSekarang.visibility = View.GONE
+                    binding.div2.visibility = View.GONE
+                }
             } else {
                 editText.setBackgroundResource(R.drawable.bg_edt_text_transparent)
             }
@@ -110,18 +204,87 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
         binding.edtTujuan.clearFocus()
     }
 
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+        })
+    }
+
+    fun EditText.makeClearableEditText(
+        onIsNotEmpty: (() -> Unit)?,
+        onClear: (() -> Unit)?,
+        clearDrawable: Drawable
+    ) {
+        val updateRightDrawable = {
+            this.setCompoundDrawables(null, null,
+                if (text.isNotEmpty()) clearDrawable else null,
+                null)
+        }
+        updateRightDrawable()
+
+        this.afterTextChanged {
+            if (it.isNotEmpty()) {
+                onIsNotEmpty?.invoke()
+            }
+            updateRightDrawable()
+        }
+        this.onRightDrawableClicked {
+            this.text.clear()
+            this.setCompoundDrawables(null, null, null, null)
+            onClear?.invoke()
+            this.requestFocus()
+        }
+    }
+
+    fun EditText.makeClearableEditText(onIsNotEmpty: (() -> Unit)?, onCleared: (() -> Unit)?) {
+        compoundDrawables[COMPOUND_DRAWABLE_RIGHT_INDEX]?.let { clearDrawable ->
+            makeClearableEditText(onIsNotEmpty, onCleared, clearDrawable)
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    fun EditText.onRightDrawableClicked(onClicked: (view: EditText) -> Unit) {
+        this.setOnTouchListener { v, event ->
+            var hasConsumed = false
+            if (v is EditText) {
+                if (event.x >= v.width - v.totalPaddingRight) {
+                    if (event.action == MotionEvent.ACTION_UP) {
+                        onClicked(this)
+                    }
+                    hasConsumed = true
+                }
+            }
+            hasConsumed
+        }
+    }
+
     private fun getLastLocation() {
+        loading(true)
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 location?.let {
+                    loading(false)
                     val latitude = location.latitude
                     val longitude = location.longitude
+                    // Mengatur RectangularBounds dengan LatLng dari lokasi terkini
+                    southwest = LatLng(latitude - 0.01, longitude - 0.01)
+                    northeast = LatLng(latitude + 0.01, longitude + 0.01)
                     getAddressFromLocation(latitude, longitude)
                 }
             }
             .addOnFailureListener { e ->
+                loading(false)
                 // Penanganan kesalahan jika gagal mendapatkan lokasi terkini
                 e.printStackTrace()
+                info(e.printStackTrace())
             }
     }
 
@@ -148,6 +311,30 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
         }.addOnFailureListener { exception ->
             // Penanganan kesalahan jika gagal mendapatkan alamat
             exception.printStackTrace()
+        }
+    }
+    private fun getLatLngFromPlaceId(placeId: String): LatLng? {
+        val placeFields = listOf(Place.Field.LAT_LNG)
+        val request = FetchPlaceRequest.newInstance(placeId, placeFields)
+
+        try {
+            val placeResponse = placesClient.fetchPlace(request).getResult()
+            val latLng = placeResponse?.place?.latLng
+            return latLng
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return null
+    }
+
+    fun loading(status : Boolean){
+        if (status){
+            progressDialog.setTitle("Loading...")
+            progressDialog.setCanceledOnTouchOutside(false)
+            progressDialog.show()
+        }else{
+            progressDialog.dismiss()
         }
     }
 }

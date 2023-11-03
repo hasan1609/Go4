@@ -1,5 +1,6 @@
 package com.go4sumbergedang.go4.adapter
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -64,12 +65,11 @@ class ChatAdapter(val order: OrderLogModel) :
 
                 holder.right_image_view?.setOnClickListener {
                     val options = arrayOf<CharSequence>(
-                        "View Full Image",
-                        "Delete Image",
-                        "Cancel"
+                        "Lihat Gambar",
+                        "Hapus Gambar",
+                        "Batal"
                     )
                     val builder = MaterialAlertDialogBuilder(holder.itemView.context)
-                    builder.setTitle("What do you want ? ")
                     builder.setItems(options) { dialog, which ->
                         if (which == 0) {
                             val intent = Intent(
@@ -97,11 +97,10 @@ class ChatAdapter(val order: OrderLogModel) :
 
                 holder.left_image_view?.setOnClickListener {
                     val options = arrayOf<CharSequence>(
-                        "View Full Image",
-                        "Cancel"
+                        "Lihat Gambar",
+                        "Batal"
                     )
                     val builder = MaterialAlertDialogBuilder(holder.itemView.context)
-                    builder.setTitle("What do you want ? ")
                     builder.setItems(options) { dialog, which ->
                         if (which == 0) {
                             val intent = Intent(
@@ -120,15 +119,13 @@ class ChatAdapter(val order: OrderLogModel) :
             }
         } else {
             holder.show_text_message?.text = chat.message
-
             if (order.customerId == chat.sender) {
                 holder.show_text_message?.setOnClickListener {
                     val options = arrayOf<CharSequence>(
-                        "Delete Message",
-                        "Cancel"
+                        "Hapus Gambar",
+                        "Batal"
                     )
                     val builder = MaterialAlertDialogBuilder(holder.itemView.context)
-                    builder.setTitle("What do you want ? ")
                     builder.setItems(options) { dialog, which ->
                         if(which == 0) {
                             deleteSentMessage(position,holder)
@@ -187,7 +184,7 @@ class ChatAdapter(val order: OrderLogModel) :
                 } else {
                     Toast.makeText(
                         holder.itemView.context,
-                        "Failed, Not Deleted",
+                        "Gagal dihapus",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

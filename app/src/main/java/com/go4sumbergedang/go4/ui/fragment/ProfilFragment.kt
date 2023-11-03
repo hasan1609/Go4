@@ -13,6 +13,7 @@ import com.go4sumbergedang.go4.databinding.FragmentProfilBinding
 import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.ui.activity.DetailAkunActivity
 import com.go4sumbergedang.go4.ui.activity.LoginActivity
+import com.go4sumbergedang.go4.ui.activity.UpdatePasswordActivity
 import com.squareup.picasso.Picasso
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.startActivity
@@ -46,6 +47,9 @@ class ProfilFragment : Fragment(), AnkoLogger {
         binding.tvNamaUser.text = sessionManager.getNama().toString()
         binding.lySetAkun.setOnClickListener {
             startActivity<DetailAkunActivity>()
+        }
+        binding.lySetPwd.setOnClickListener {
+            startActivity<UpdatePasswordActivity>()
         }
         binding.txtLogout.setOnClickListener {
             val builder = AlertDialog.Builder(requireActivity())

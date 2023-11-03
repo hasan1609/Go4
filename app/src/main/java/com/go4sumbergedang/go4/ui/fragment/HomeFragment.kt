@@ -58,33 +58,6 @@ class HomeFragment : Fragment(), AnkoLogger {
         // Inisialisasi Geocoder
         geocoder = Geocoder(requireContext(), Locale.getDefault())
 
-//        val matrix = ColorMatrix()
-//        matrix.setSaturation(0f)
-//        val filter = ColorMatrixColorFilter(matrix)
-//        if(sessionManager.getisOrderResto() == true)
-//        {
-//            binding.cardMakanan.isClickable = false
-//            binding.cardMakanan.isFocusable = false
-//            for (i in 0 until binding.cardMakanan.childCount) {
-//                val child = binding.cardMakanan.getChildAt(i)
-//                child.isClickable = false
-//                child.isFocusable = false
-//            }
-//            binding.cardMakanan.alpha = 0.5f
-//            binding.cardMakanan.setOnTouchListener { _, _ -> true }
-//        }
-//        if(sessionManager.getisOrderTransport() == true)
-//        {
-//            binding.cardMotor.isClickable = false
-//            binding.cardMotor.isFocusable = false
-//            for (i in 0 until binding.cardMakanan.childCount) {
-//                val child = binding.cardMakanan.getChildAt(i)
-//                child.isClickable = false
-//                child.isFocusable = false
-//            }
-//            binding.cardMotor.alpha = 0.5f
-//            binding.cardMotor.setOnTouchListener { _, _ -> true }
-//        }
         binding.lyLokasi.setOnClickListener {
             val intent = intentFor<ActivityMaps>()
                 .putExtra("type", "alamatku")

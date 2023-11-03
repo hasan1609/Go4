@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -15,10 +16,14 @@ import com.go4sumbergedang.go4.session.SessionManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 import java.util.*
@@ -34,6 +39,7 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
     private lateinit var geocoder: Geocoder
     private val permissionCode = 101
     var dataType: String? = null
+    var placeId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +47,7 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
         binding.lifecycleOwner = this
         sessionManager = SessionManager(this)
         dataType = intent.getStringExtra("type")
+        placeId = intent.getStringExtra("placeId")
         setupUI()
     }
 
@@ -94,9 +101,38 @@ class ActivityMaps : AppCompatActivity(), AnkoLogger, OnMapReadyCallback, Google
         Places.initialize(this, getString(R.string.google_maps_key))
         mMap = googleMap
         placesClient = Places.createClient(this)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 20f))
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 20f))
         mMap.isMyLocationEnabled = true
         mMap.setOnCameraIdleListener(this)
+        if (placeId != null) {
+            val placeFields = listOf(Place.Field.LAT_LNG)
+            val request = FetchPlaceRequest.newInstance(placeId, placeFields)
+            placesClient.fetchPlace(request).addOnSuccessListener { response ->
+                val place = response.place
+                val location = place.latLng
+                val cameraPosition = CameraPosition.Builder()
+                    .target(location)
+                    .zoom(15f)  // Sesuaikan level zoom sesuai kebutuhan
+                    .build()
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+            }.addOnFailureListener { exception ->
+                // Tangani kesalahan saat mengambil lokasi dari placeId
+                exception.printStackTrace()
+            }
+        } else {
+            // Jika placeId null, maka gunakan lokasi terkini
+            val task = mFusedLocationProviderClient.lastLocation
+            task.addOnSuccessListener { location ->
+                if (location != null) {
+                    currentLocation = location
+                    val cameraPosition = CameraPosition.Builder()
+                        .target(LatLng(currentLocation.latitude, currentLocation.longitude))
+                        .zoom(15f)  // Sesuaikan level zoom sesuai kebutuhan
+                        .build()
+                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                }
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

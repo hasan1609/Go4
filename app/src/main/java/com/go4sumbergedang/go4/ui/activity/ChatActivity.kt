@@ -8,11 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager.TAG
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.adapter.ChatAdapter
+import com.go4sumbergedang.go4.databinding.ActivityChatBinding
 import com.go4sumbergedang.go4.model.ChatModel
 import com.go4sumbergedang.go4.model.OrderLogModel
 import com.go4sumbergedang.go4.ui.activity.ChatActivity.Companion.TAG
@@ -29,51 +32,46 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_chat.*
 
 class ChatActivity : AppCompatActivity() {
-
+    private lateinit var binding: ActivityChatBinding
     companion object {
         internal val TAG = ChatActivity::class.java.simpleName
         //image pick code
         private const val IMAGE_PICK_CODE = 1000
     }
-
     private var driverId: String? = null
     private var mUser: String? = null
     private lateinit var reference: DatabaseReference
     private lateinit var chatAdapter: ChatAdapter
     private lateinit var chatList: List<ChatModel>
     var order: OrderLogModel? = null
-
     private var notify = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
+        binding.lifecycleOwner = this
         val gson = Gson()
         order = gson.fromJson(intent.getStringExtra("order"), OrderLogModel::class.java)
         driverId = order!!.driverId
         mUser = order!!.customerId
-        with(rv_chat) {
+        binding.appBar.btnToKeranjang.visibility = View.GONE
+        binding.appBar.titleTextView.text = order!!.driver!!.nama!!.toString().toUpperCase()
+        binding.appBar.backButton.setOnClickListener {
+            onBackPressed()
+        }
+        with(binding.rvChat) {
             setHasFixedSize(true)
             val linearLayoutManager = LinearLayoutManager(this@ChatActivity)
             linearLayoutManager.stackFromEnd = true
             layoutManager = linearLayoutManager
         }
-        reference = FirebaseDatabase.getInstance().reference.child("users").child(driverId!!)
-        reference.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-                Log.d(TAG, p0.message)
-            }
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                retrieveMessage(mUser, driverId.toString())
-            }
-        })
-
+        retrieveMessage(mUser, driverId.toString())
         img_send_message.setOnClickListener {
             val message = edt_text_message.text.toString()
             notify = true
             if (TextUtils.isEmpty(message)) {
                 Toast.makeText(
                     this,
-                    "Please write message, first ...",
+                    "Masukkan Pesan ...",
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
@@ -110,7 +108,7 @@ class ChatActivity : AppCompatActivity() {
                     }
                     chatAdapter = ChatAdapter(order!!)
                     chatAdapter.setData(chatList as ArrayList<ChatModel>)
-                    rv_chat.adapter = chatAdapter
+                    binding.rvChat.adapter = chatAdapter
                 }
             }
 
@@ -241,6 +239,8 @@ class ChatActivity : AppCompatActivity() {
     }
     override fun onPause() {
         super.onPause()
-        reference.removeEventListener(seenListener!!)
+        if (::reference.isInitialized) {
+            reference.removeEventListener(seenListener!!)
+        }
     }
 }
