@@ -53,7 +53,7 @@ class ProfilFragment : Fragment(), AnkoLogger {
         }
         binding.txtLogout.setOnClickListener {
             val builder = AlertDialog.Builder(requireActivity())
-            builder.setMessage("Logout ? ")
+            builder.setMessage("Yakin Ingin Keluar")
             builder.setPositiveButton("Ok") { dialog, which ->
                 sessionManager.clearSession()
                 startActivity<LoginActivity>()

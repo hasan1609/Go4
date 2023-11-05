@@ -51,11 +51,35 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
             "0" -> {
                 binding.contentBottom.status.text = "Menunngu Konfirmasi Driver"
             }
+            "7" ->{
+                when(order!!.kategori){
+                    "resto" -> {
+                        binding.contentBottom.status.text = "Menunggu Driver menuju lokasi resto"
+                    }
+                    else ->{
+                        binding.contentBottom.status.text = "Menunggu driver menuju lokasi penjemputan"
+                    }
+                }
+            }
             "1" -> {
-                binding.contentBottom.status.text = "Driver menuju lokasi penjemputan"
+                when(order!!.kategori){
+                    "resto" -> {
+                        binding.contentBottom.status.text = "Driver menuju lokasi resto"
+                    }
+                    else ->{
+                        binding.contentBottom.status.text = "Driver menuju lokasi penjemputan"
+                    }
+                }
             }
             "2" -> {
-                binding.contentBottom.status.text = "Driver sedang menuju lokasi tujuan"
+                when(order!!.kategori){
+                    "resto" -> {
+                        binding.contentBottom.status.text = "Driver sampai lokasi resto"
+                    }
+                    else ->{
+                        binding.contentBottom.status.text = "Driver sampai lokasi penjemputan"
+                    }
+                }
             }
             "3" -> {
                 binding.contentBottom.status.text = "Driver menuju lokasi pengantaran"
@@ -114,13 +138,44 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
                 if (dataSnapshot.exists()) {
                     val latitude = dataSnapshot.child("latitude").getValue(Double::class.java)
                     val longitude = dataSnapshot.child("longitude").getValue(Double::class.java)
+                    val status = dataSnapshot.child("status").getValue(Int::class.java)
 
                     if (latitude != null && longitude != null) {
                         updateMapWithLocation(latitude, longitude)
+                        when(status){
+                            1 -> {
+                                when(order!!.kategori){
+                                    "resto" -> {
+                                        binding.contentBottom.status.text = "Driver menuju lokasi resto"
+                                    }
+                                    else ->{
+                                        binding.contentBottom.status.text = "Driver menuju lokasi penjemputan"
+                                    }
+                                }
+                            }
+                            2 -> {
+                                when(order!!.kategori){
+                                    "resto" -> {
+                                        binding.contentBottom.status.text = "Driver sampai lokasi resto"
+                                    }
+                                    else ->{
+                                        binding.contentBottom.status.text = "Driver sampai lokasi penjemputan"
+                                    }
+                                }
+                            }
+                            3 -> {
+                                binding.contentBottom.status.text = "Driver menuju lokasi Tujuan"
+                            }
+                            4 -> {
+                                binding.contentBottom.status.text = "Driver telah sampai pada tujuan"
+                            }
+                            5 -> {
+                                binding.contentBottom.status.text = "Selesai"
+                            }
+                        }
                     }
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 // Handle error (optional)
             }
