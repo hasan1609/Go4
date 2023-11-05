@@ -38,6 +38,7 @@ class UpdatePasswordActivity : AppCompatActivity(), AnkoLogger {
         setupUi()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupUi() {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
