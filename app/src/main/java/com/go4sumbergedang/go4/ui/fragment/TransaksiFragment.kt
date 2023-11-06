@@ -78,7 +78,7 @@ class TransaksiFragment : Fragment(), AnkoLogger {
                                 mAdapter.setDialog(object : RiwayatOrderAdapter.Dialog {
                                     override fun onClick(position: Int, order: OrderLogModel, status: String) {
                                         when (status) {
-                                            "0", "1", "2", "3","4","7" -> {
+                                            "0", "1", "2", "3","7" -> {
                                                 val gson = Gson()
                                                 val noteJoson = gson.toJson(order)
                                                 startActivity<TrackingOrderActivity>("order" to noteJoson)

@@ -102,6 +102,9 @@ class TrackingOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallbac
         binding.contentBottom.txtPlat.text = order!!.detailDriver!!.platNo
         binding.contentBottom.txtKendaraan.text = order!!.detailDriver!!.kendaraan
         binding.contentBottom.nama.text = order!!.driver!!.nama
+        binding.contentBottom.btnDetailOrder.setOnClickListener {
+            startActivity<DetailRiwayatOrderActivity>("idOrder" to order!!.idOrder.toString())
+        }
         binding.contentBottom.chat.setOnClickListener {
             startActivity<ChatActivity>("order" to intent.getStringExtra("order"))
         }

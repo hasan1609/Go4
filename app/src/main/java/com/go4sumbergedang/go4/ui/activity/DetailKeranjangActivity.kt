@@ -107,6 +107,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                             }else{
                                 dismissLoadingDialog()
                                 toast("Driver Kosong")
+                                info(response.body())
                             }
                         } else {
                             dismissLoadingDialog()

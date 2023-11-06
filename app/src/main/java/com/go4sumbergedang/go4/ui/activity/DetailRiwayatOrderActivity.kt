@@ -103,6 +103,18 @@ class DetailRiwayatOrderActivity : AppCompatActivity() , AnkoLogger{
 
                         when (data.order.status) {
                             "0" -> {
+                                binding.txtStatus.text = "Menunggu konfirmasi driver"
+                                binding.txtStatus.setTextColor(getColor(R.color.primary_color))
+                            }
+                            "7" -> {
+                                if(data.produk == null){
+                                    binding.txtStatus.text = "Menunggu driver menuju ke lokasi resto"
+                                }else{
+                                    binding.txtStatus.text = "Menunggu driver menuju ke lokasi penjemputan"
+                                }
+                                binding.txtStatus.setTextColor(getColor(R.color.primary_color))
+                            }
+                            "1" -> {
                                 if(data.produk == null){
                                     binding.txtStatus.text = "Driver menuju ke lokasi resto"
                                 }else{
@@ -110,7 +122,7 @@ class DetailRiwayatOrderActivity : AppCompatActivity() , AnkoLogger{
                                 }
                                 binding.txtStatus.setTextColor(getColor(R.color.primary_color))
                             }
-                            "1" -> {
+                            "2" -> {
                                 if(data.produk == null){
                                     binding.txtStatus.text = "Driver sampai di lokasi resto"
                                 }else{
@@ -118,15 +130,15 @@ class DetailRiwayatOrderActivity : AppCompatActivity() , AnkoLogger{
                                 }
                                 binding.txtStatus.setTextColor(getColor(R.color.primary_color))
                             }
-                            "2" -> {
+                            "3" -> {
                                 binding.txtStatus.text = "Driver sedang menuju lokasi tujuan"
                                 binding.txtStatus.setTextColor(getColor(R.color.primary_color))
                             }
-                            "3" -> {
+                            "4" -> {
                                 binding.txtStatus.text = "Driver telah sampai lokasi tujuan"
                                 binding.txtStatus.setTextColor(getColor(R.color.primary_color))
                             }
-                            "4" -> {
+                            "5" -> {
                                 binding.txtStatus.text = "Selesai"
                                 binding.txtStatus.setTextColor(getColor(R.color.teal_700))
                             }

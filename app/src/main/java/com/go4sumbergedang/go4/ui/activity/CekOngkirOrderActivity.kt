@@ -103,6 +103,7 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
                             }else{
                                 dismissLoadingDialog()
                                 toast("Driver Kosong")
+                                info(response.body())
                             }
                         } else {
                             dismissLoadingDialog()
