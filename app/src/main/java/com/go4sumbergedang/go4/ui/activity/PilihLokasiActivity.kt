@@ -1,12 +1,16 @@
 package com.go4sumbergedang.go4.ui.activity
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
@@ -45,6 +49,7 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
     private lateinit var lokasiAdapter: LokasiAdapter
     private var activeEditText: EditText? = null  // Menyimpan referensi ke EditText yang aktif
     private val COMPOUND_DRAWABLE_RIGHT_INDEX = 2
+    private val REQUEST_ENABLE_GPS = 123
     var southwest: LatLng? = null
     var northeast: LatLng? = null
 
@@ -54,7 +59,9 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
         binding.lifecycleOwner = this
         sessionManager = SessionManager(this)
         progressDialog = ProgressDialog(this)
+    }
 
+    private fun setupUi(){
         Places.initialize(this, getString(R.string.google_maps_key))
         placesClient = Places.createClient(this)
         // Inisialisasi FusedLocationProviderClient
@@ -66,6 +73,7 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
         } else {
             // Handle jika izin lokasi tidak diberikan
             // Anda bisa meminta izin di sini
+            showGPSEnableDialog()
         }
 
         binding.back.setOnClickListener { onBackPressed() }
@@ -111,9 +119,7 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
 
     // Fungsi untuk mengupdate RecyclerView dengan prediksi lokasi
     private fun updateRecyclerViewWithPredictions(query: String, editText: EditText) {
-//        // Membuat AutocompleteFilter yang memungkinkan tempat kecil
         val token = AutocompleteSessionToken.newInstance()
-//        // Membuat FindAutocompletePredictionsRequest dengan token
         val request = FindAutocompletePredictionsRequest.builder()
             .setTypeFilter(TypeFilter.ESTABLISHMENT)
 //            .setLocationBias(
@@ -131,20 +137,13 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
             val predictions = response.autocompletePredictions
             // Perbarui RecyclerView sesuai dengan EditText yang sedang aktif
             if (activeEditText == editText) {
-//                info(predictions.map { it.getFullText(null).toString() })
-//                locationSuggestions.clear()
-//                locationSuggestions.addAll(predictions.map { it.getFullText(null).toString() })
-//                lokasiAdapter.notifyDataSetChanged()
-//                info(predictions.map { it.placeId })
-                if (activeEditText == editText) {
-                    info(predictions.map { it.getFullText(null).toString() })
-                    locationSuggestions.clear()
-                    locationSuggestions.addAll(predictions.map { it.getFullText(null).toString() })
-                    placeIds.clear()
-                    placeIds.addAll(predictions.map { it.placeId.toString() })
-                    lokasiAdapter.notifyDataSetChanged()
-                    info(predictions.map { it.placeId })
-                }
+                info(predictions.map { it.getFullText(null).toString() })
+                locationSuggestions.clear()
+                locationSuggestions.addAll(predictions.map { it.getFullText(null).toString() })
+                placeIds.clear()
+                placeIds.addAll(predictions.map { it.placeId.toString() })
+                lokasiAdapter.notifyDataSetChanged()
+                info(predictions.map { it.placeId })
             }
         }.addOnFailureListener { exception ->
             // Tangani kesalahan saat mengambil prediksi.
@@ -154,6 +153,12 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
+        if (isGPSEnabled()) {
+            setupUi()
+        } else {
+            // Jika GPS tidak aktif, tampilkan dialog untuk mengaktifkannya
+            showGPSEnableDialog()
+        }
         if (sessionManager.getLokasiDari() != null) {
             binding.edtDari.setText(sessionManager.getLokasiDari())
         }
@@ -313,19 +318,41 @@ class PilihLokasiActivity : AppCompatActivity(), AnkoLogger {
             exception.printStackTrace()
         }
     }
-    private fun getLatLngFromPlaceId(placeId: String): LatLng? {
-        val placeFields = listOf(Place.Field.LAT_LNG)
-        val request = FetchPlaceRequest.newInstance(placeId, placeFields)
 
-        try {
-            val placeResponse = placesClient.fetchPlace(request).getResult()
-            val latLng = placeResponse?.place?.latLng
-            return latLng
-        } catch (e: Exception) {
-            e.printStackTrace()
+    private fun isGPSEnabled(): Boolean {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
+    private fun showGPSEnableDialog() {
+        val alertDialog = AlertDialog.Builder(this)
+        alertDialog.setTitle("GPS Tidak Aktif")
+        alertDialog.setMessage("GPS Anda tidak aktif. Aktifkan GPS untuk menggunakan fitur lokasi.")
+        alertDialog.setPositiveButton("Pengaturan") { _, _ ->
+            // Jika pengguna menekan "Pengaturan", buka pengaturan lokasi
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivityForResult(intent, REQUEST_ENABLE_GPS)
         }
+        alertDialog.setNegativeButton("Batal") { _, _ ->
+            // Jika pengguna menekan "Batal", tutup aplikasi atau lakukan tindakan lain
+            toast("Harap Aktifkan GPS")
+            finish()
+        }
+        alertDialog.setCancelable(false)
+        alertDialog.show()
+    }
 
-        return null
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_ENABLE_GPS) {
+            // Proses hasil dari aktivitas pengaturan lokasi
+            if (isGPSEnabled()) {
+                setupUi()
+            } else {
+                // GPS masih tidak aktif, sesuaikan tindakan sesuai kebutuhan aplikasi Anda
+                finish()
+            }
+        }
     }
 
     fun loading(status : Boolean){

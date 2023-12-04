@@ -162,8 +162,12 @@ interface ApiService {
     fun getDetailOrderLog(
         @Path("id") id: String
     ): Call<ResponseDetailLogOrder>
-
-
+    // GET DRIVER MANUAL
+    @GET("driver/manual/{latitude}&{longitude}")
+    fun getDriverManual(
+        @Path("latitude") latitude: String,
+        @Path("longitude") longitude: String
+    ): Call<ResponseDriverManual>
 
     // TODO: NOTIFIKASI 
     @GET("notifikasi/{id}")

@@ -17,8 +17,10 @@ import com.go4sumbergedang.go4.model.ResponseOrderLog
 import com.go4sumbergedang.go4.session.SessionManager
 import com.go4sumbergedang.go4.ui.activity.DetailRiwayatOrderActivity
 import com.go4sumbergedang.go4.ui.activity.TrackingOrderActivity
+import com.go4sumbergedang.go4.utils.NetworkUtils
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_transaksi.view.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.startActivity
@@ -45,11 +47,14 @@ class TransaksiFragment : Fragment(), AnkoLogger {
         binding.lifecycleOwner = this
         sessionManager = SessionManager(requireActivity())
         progressDialog = ProgressDialog(requireActivity())
-
+        binding.lyKoneksi.btn_refresh.setOnClickListener {
+            getData(sessionManager.getId().toString())
+        }
         return binding.root
     }
 
     private fun getData(userId: String) {
+        binding.lyKoneksi.visibility = View.GONE
         binding.rvTransaksi.layoutManager = LinearLayoutManager(requireActivity())
         binding.rvTransaksi.setHasFixedSize(true)
         (binding.rvTransaksi.layoutManager as LinearLayoutManager).orientation =
@@ -97,7 +102,9 @@ class TransaksiFragment : Fragment(), AnkoLogger {
                     } else {
                         loading(false)
                         toast("gagal mendapatkan response")
+                        binding.lyKoneksi.visibility = View.VISIBLE
                     }
+
                 } catch (e: Exception) {
                     if (isAdded) {
                         loading(false)
@@ -109,8 +116,10 @@ class TransaksiFragment : Fragment(), AnkoLogger {
 
             override fun onFailure(call: Call<ResponseOrderLog>, t: Throwable) {
                 if (isAdded) {
+                    loading(false)
                     info { "hasan ${t.message}" }
-                    toast(t.message.toString())
+//                    toast(t.message.toString())
+                    binding.lyKoneksi.visibility = View.VISIBLE
                 }
             }
         })
@@ -128,6 +137,12 @@ class TransaksiFragment : Fragment(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-        getData(sessionManager.getId().toString())
+        if (NetworkUtils.isInternetAvailable(requireContext())) {
+            // Tampilkan konten
+            getData(sessionManager.getId().toString())
+        } else {
+            // Tampilkan logo koneksi tidak ada
+            binding.lyKoneksi.visibility = View.VISIBLE
+        }
     }
 }

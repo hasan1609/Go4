@@ -2,6 +2,7 @@ package com.go4sumbergedang.go4.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.NotifikasiLogModel
 import com.go4sumbergedang.go4.model.OngkirModel
+import com.go4sumbergedang.go4.ui.activity.MotorManualActivity
 import com.squareup.picasso.Picasso
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -86,6 +88,12 @@ class OngkirAdapter (
                 selectedPosition = position
                 notifyItemChanged(previousSelected)
                 notifyItemChanged(position)
+
+                val selectedOngkirModel = getSelectedOngkirModel()
+                if (selectedOngkirModel!!.jenisKendaraan == "motor_manual") {
+                    val intent = Intent(context, MotorManualActivity::class.java)
+                    context.startActivity(intent)
+                }
             }
         }
     }

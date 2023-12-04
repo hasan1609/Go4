@@ -4,12 +4,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.RestoNearModel
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import java.util.*
 
 class RestoTerdekatAdapter (
     private val listData :MutableList<RestoNearModel>,
@@ -70,6 +72,51 @@ class RestoTerdekatAdapter (
         holder.itemView.setOnClickListener {
             if (dialog!=null){
                 dialog!!.onClick(position, list.userId.toString())
+            }
+        }
+    }
+
+    val initialSearchDataList = mutableListOf<RestoNearModel>().apply {
+        listData.let { addAll(it) }
+    }
+
+    fun getFilter(): Filter {
+        return searchFilter
+    }
+
+    private val searchFilter = object : Filter() {
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val filteredList: MutableList<RestoNearModel> = mutableListOf()
+            if (constraint == null || constraint.isEmpty()) {
+                initialSearchDataList.let { filteredList.addAll(it) }
+            } else {
+                val query = constraint.toString().trim().toLowerCase(Locale.ROOT)
+                initialSearchDataList.forEach { resto ->
+                    // Periksa namaResto
+                    if (resto.namaResto!!.toLowerCase(Locale.ROOT).contains(query)) {
+                        filteredList.add(resto)
+                    } else {
+                        // Periksa nama_produk pada setiap produk di dalam resto
+                        resto.produk?.forEach { produk ->
+                            if (produk!!.namaProduk?.toLowerCase(Locale.ROOT)?.contains(query) == true) {
+                                filteredList.add(resto)
+                                // Hentikan loop jika sudah menemukan match pada produk
+                                return@forEach
+                            }
+                        }
+                    }
+                }
+            }
+            val results = FilterResults()
+            results.values = filteredList
+            return results
+        }
+
+        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+            if (results?.values is MutableList<*>) {
+                listData.clear()
+                listData.addAll(results.values as MutableList<RestoNearModel>)
+                notifyDataSetChanged()
             }
         }
     }

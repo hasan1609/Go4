@@ -11,31 +11,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.fragment.TransaksiFragment">
-        <TextView
+        tools:context=".ui.activity.MotorManualActivity">
+
+        <include
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Riwayat Pesanan"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginVertical="20dp"
-            android:gravity="center"/>
+            layout="@layout/custom_appbar"/>
 
         <TextView
             android:id="@+id/txt_kosong"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Keranjang Anda Masih Kosong"
+            android:layout_height="match_parent"
+            android:text="Tidak ada driver disekitar anda"
             android:textSize="14sp"
-            android:textStyle="normal"
+            android:textStyle="bold"
             android:visibility="gone"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:layout_gravity="center_vertical"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/rv_transaksi"
+            android:id="@+id/rv_driver"
             android:visibility="gone"
+            android:layout_marginHorizontal="10dp"
             android:nestedScrollingEnabled="false"
             android:layout_marginBottom="25dp" />
 

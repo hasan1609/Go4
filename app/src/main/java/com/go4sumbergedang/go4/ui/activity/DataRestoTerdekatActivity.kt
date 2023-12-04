@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.go4sumbergedang.go4.R
@@ -48,6 +49,18 @@ class DataRestoTerdekatActivity : AppCompatActivity(), AnkoLogger {
             startActivity<KeranjangActivity>()
         }
 
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                mAdapter.getFilter().filter(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                mAdapter.getFilter().filter(newText)
+                return true
+            }
+
+        })
     }
 
     private fun getData(latitude: String, longitude : String) {
