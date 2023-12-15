@@ -54,7 +54,7 @@
                             android:textStyle="italic|bold"
                             android:textColor="@color/primary_color"
                             android:gravity="center"
-                            android:text="Verivied"/>
+                            android:text="Verified"/>
                     </LinearLayout>
                 </LinearLayout>
 

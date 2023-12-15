@@ -17,5 +17,11 @@ data class DataDriverManual(
 	val distance: Float? = null,
 
 	@field:SerializedName("driver")
-	val driver: DriverModel? = null
+	val driver: DriverModel? = null,
+
+	@field:SerializedName("latitude")
+	val latitude: String? = null,
+
+	@field:SerializedName("longitude")
+	val longitude: String? = null,
 )

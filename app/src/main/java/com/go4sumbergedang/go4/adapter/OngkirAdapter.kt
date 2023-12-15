@@ -7,18 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
-import com.go4sumbergedang.go4.model.NotifikasiLogModel
 import com.go4sumbergedang.go4.model.OngkirModel
 import com.go4sumbergedang.go4.ui.activity.MotorManualActivity
-import com.squareup.picasso.Picasso
+import com.google.gson.Gson
+import org.jetbrains.anko.startActivity
 import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-import java.util.*
 
 class OngkirAdapter (
     private val listData :MutableList<OngkirModel>,
@@ -91,8 +87,9 @@ class OngkirAdapter (
 
                 val selectedOngkirModel = getSelectedOngkirModel()
                 if (selectedOngkirModel!!.jenisKendaraan == "motor_manual") {
-                    val intent = Intent(context, MotorManualActivity::class.java)
-                    context.startActivity(intent)
+                    val gson = Gson()
+                    val noteJson = gson.toJson(selectedOngkirModel)
+                    context.startActivity<MotorManualActivity>("ongkir" to noteJson)
                 }
             }
         }

@@ -19,6 +19,7 @@ import com.go4sumbergedang.go4.adapter.ItemCartAdapter
 import com.go4sumbergedang.go4.databinding.ActivityDetailKeranjangBinding
 import com.go4sumbergedang.go4.model.*
 import com.go4sumbergedang.go4.session.SessionManager
+import com.go4sumbergedang.go4.utils.GenerateRandomKey
 import com.go4sumbergedang.go4.utils.LoadingDialogSearch
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -45,6 +46,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
     private val cartItems = mutableListOf<ItemCartModel>()
     private var ongkire: Int? = null
     private var total = 0.0
+    var idOrder: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +62,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
         binding.appBar.backButton.setOnClickListener {
             onBackPressed()
         }
+        idOrder = GenerateRandomKey.generateKeyFromDatetime()
         binding.txtLokasi.text = sessionManager.getLokasiSekarang()
         binding.lokasi.setOnClickListener {
             startActivity<ActivityMaps>("type" to "alamatku")
@@ -80,6 +83,7 @@ class DetailKeranjangActivity : AppCompatActivity(), AnkoLogger {
                 info("Semua item dalam RecyclerView:\n$allItemsInfo")
                 showLoadingDialog()
                 api.addBooking(
+                    idOrder.toString(),
                     allItemsInfo.toString(),
                     sessionManager.getLokasiSekarang().toString(),
                     sessionManager.getLatitude().toString(),

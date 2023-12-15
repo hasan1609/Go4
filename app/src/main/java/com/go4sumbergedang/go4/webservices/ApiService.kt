@@ -127,6 +127,7 @@ interface ApiService {
     @FormUrlEncoded
     @POST("booking")
     fun addBooking(
+        @Field("id_order") id_order: String,
         @Field("id") id: String,
         @Field("alamat_tujuan") alamat_tujuan: String,
         @Field("latitude_tujuan") latitude_tujuan: String,
@@ -142,6 +143,7 @@ interface ApiService {
     @FormUrlEncoded
     @POST("booking")
     fun addBookingDriver(
+        @Field("id_order") id_order: String,
         @Field("alamat_tujuan") alamat_tujuan: String,
         @Field("latitude_tujuan") latitude_tujuan: String,
         @Field("longitude_tujuan") longitude_tujuan: String,
@@ -151,6 +153,24 @@ interface ApiService {
         @Field("kategori") kategori: String,
         @Field("ongkir") ongkir: String,
         @Field("user_id") user_id: String
+    ): Call<ResponseSearchDriver>
+
+    @FormUrlEncoded
+    @POST("order/manual")
+    fun addBookingDriverManual(
+        @Field("id_order") id_order: String,
+        @Field("alamat_tujuan") alamat_tujuan: String,
+        @Field("latitude_tujuan") latitude_tujuan: String,
+        @Field("longitude_tujuan") longitude_tujuan: String,
+        @Field("longitude_dari") longitude_dari: String,
+        @Field("latitude_dari") latitude_dari: String,
+        @Field("alamat_dari") alamat_dari: String,
+        @Field("latitude_driver") latitude_driver: String,
+        @Field("longitude_driver") longitude_driver: String,
+        @Field("kategori") kategori: String,
+        @Field("ongkir") ongkir: String,
+        @Field("user_id") user_id: String,
+        @Field("driver_id") driver_id: String
     ): Call<ResponseSearchDriver>
     // GET ORDER LOG
     @GET("order/customer/{id}")

@@ -15,6 +15,7 @@ import com.go4sumbergedang.go4.adapter.OngkirAdapter
 import com.go4sumbergedang.go4.databinding.ActivityCekOngkirOrderBinding
 import com.go4sumbergedang.go4.model.*
 import com.go4sumbergedang.go4.session.SessionManager
+import com.go4sumbergedang.go4.utils.GenerateRandomKey
 import com.go4sumbergedang.go4.utils.LoadingDialogSearch
 import com.go4sumbergedang.go4.webservices.ApiClient
 import com.go4sumbergedang.go4.webservices.MapsService
@@ -43,7 +44,7 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
     private lateinit var sessionManager: SessionManager
     private lateinit var mMap: GoogleMap
     private lateinit var progressDialog: ProgressDialog
-
+    var idOrder: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +52,8 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
         binding.lifecycleOwner = this
         sessionManager = SessionManager(this)
         progressDialog = ProgressDialog(this)
+        idOrder = GenerateRandomKey.generateKeyFromDatetime()
+
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout)
         // Set peekHeight agar hanya 1/4 bagian
         bottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 9
@@ -76,6 +79,7 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
             if (selectedOngkirModel != null) {
                 showLoadingDialog()
                 api.addBookingDriver(
+                    idOrder.toString(),
                     sessionManager.getLokasiTujuan().toString(),
                     sessionManager.getLatitudeTujuan().toString(),
                     sessionManager.getLongitudeTujuan().toString(),
@@ -118,7 +122,6 @@ class CekOngkirOrderActivity : AppCompatActivity(), AnkoLogger, OnMapReadyCallba
                         dismissLoadingDialog()
                     }
                 })
-                selectedOngkirModel.harga.toString()
             } else {
                 toast("Pilih Kendaraan dahulu")
             }

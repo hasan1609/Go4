@@ -1,5 +1,6 @@
 package com.go4sumbergedang.go4.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,24 +10,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.go4sumbergedang.go4.R
 import com.go4sumbergedang.go4.model.DataDriverManual
-import com.go4sumbergedang.go4.model.RestoNearModel
 import com.squareup.picasso.Picasso
-import de.hdodenhof.circleimageview.CircleImageView
 
 class DriverManualAdapter (
     private val listData :MutableList<DataDriverManual>,
     private val context: Context
 ) : RecyclerView.Adapter<DriverManualAdapter.ViewHolder>() {
 
-    private var dialog: Dialog? = null
-
-    interface Dialog {
-        fun onClick(position: Int, idDriver: String)
-    }
-
-    fun setDialog(dialog: Dialog) {
-        this.dialog = dialog
-    }
+    private var selectedPosition = -1
+    private var selectedOngkirModel: DataDriverManual? = null
 
     override fun getItemCount(): Int {
         return listData.size
@@ -51,7 +43,7 @@ class DriverManualAdapter (
 
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val list = listData[position]
         val urlImage = context.getString(R.string.urlImage)
         val fotoDriver = list.driver!!.detailDriver!!.foto
@@ -73,10 +65,28 @@ class DriverManualAdapter (
                 .load(urlImage + def)
                 .into(holder.foto)
         }
+        if (position == selectedPosition) {
+            holder.itemView.setBackgroundResource(R.color.primary_color) // Ganti dengan drawable latar belakang yang sesuai
+        }else{
+            holder.itemView.setBackgroundResource(R.color.white)
+        }
+
         holder.itemView.setOnClickListener {
-            if (dialog != null) {
-                dialog!!.onClick(position, list.driverId.toString())
+            // Mengubah latar belakang item saat diklik
+            if (selectedPosition != position) {
+                val previousSelected = selectedPosition
+                selectedPosition = position
+                notifyItemChanged(previousSelected)
+                notifyItemChanged(position)
             }
+        }
+    }
+
+    fun getSelectedDriverModel(): DataDriverManual? {
+        return if (selectedPosition != -1) {
+            listData[selectedPosition]
+        } else {
+            null
         }
     }
 }
